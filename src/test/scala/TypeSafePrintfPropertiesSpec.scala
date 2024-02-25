@@ -21,6 +21,14 @@ object TypeSafePrintfPropertiesSpec extends Properties("TypeSafePrintf")  {
 
 class TypeSafePrintfSpec extends AnyFlatSpec with Matchers {
 
+  it should "should not compile %s due to EmptyTuple tail" in {
+    assertDoesNotCompile("summon[ArgTypes[\"%s\"] =:= (String)]")
+  }
+
+  it should "represent %s as (String, EmptyTuple)" in {
+    assertCompiles("summon[ArgTypes[\"%s\"] =:= String *: EmptyTuple]")
+  }
+
   it should "represent %s %s as (String, String)" in {
     assertCompiles("summon[ArgTypes[\"%s %s\"] =:= (String, String)]")
   }
