@@ -1,14 +1,17 @@
 package workshop
 
+import workshop.SafeHead.Nat.{Succ, _0}
 import workshop.SafeHead.SizedVector.{NonEmpty, VNil}
 
 object SafeHead extends App {
 
   sealed trait Nat
 
-  class _0 extends Nat
+  object Nat {
+    class _0 extends Nat
 
-  class Succ[Prev <: Nat] extends Nat
+    class Succ[Prev <: Nat] extends Nat
+  }
 
   sealed trait SizedVector[+A, N <: Nat] {
     xs =>
@@ -23,11 +26,12 @@ object SafeHead extends App {
 
     case object VNil extends VNil
 
-    given [A, N <: Nat]: Conversion[SizedVector[A, Succ[N]], NonEmpty[A, N]] =
-      v => v.asInstanceOf[NonEmpty[A, N]]
+    given [A, N <: Nat]: Conversion[SizedVector[A, Succ[N]], NonEmpty[A, N]] = {
+      case ne@NonEmpty(head, tail) => ne // input has: Succ[N] = N + 1 as size so it's not empty
+    }
 
     extension [A, M <: Nat](xs: SizedVector[A, M]) {
-      def ++[N <: Nat](ys: SizedVector[A, N])(using concat: VConcat[A, SizedVector[A, M], SizedVector[A, N]]): concat.Out = concat(xs, ys)
+      def ++[N <: Nat](ys: SizedVector[A, N])(using concat: VConcat[A, M, N]): concat.Out = concat(xs, ys)
 
     }
 
@@ -38,33 +42,25 @@ object SafeHead extends App {
 
   }
 
-  trait VConcat[A, XS, YS] {
+  trait VConcat[A, N <: Nat, M <: Nat] {
     type MN <: Nat
     type Out = SizedVector[A, MN]
 
-    def apply(xs: XS, ys: YS): Out
+    def apply(xs: SizedVector[A, N], ys: SizedVector[A, M]): Out
   }
 
   object VConcat {
-    given vnilConcat[A, N <: Nat]: VConcat[A, SizedVector[A, _0], SizedVector[A, N]] with {
+    given vnilConcat[A, N <: Nat]: VConcat[A, _0, N] with {
       type MN = N
 
       def apply(xs: SizedVector[A, _0], ys: SizedVector[A, N]): Out = ys
     }
 
-    given vconsConcat[A, M <: Nat, N <: Nat](using ctail: VConcat[A, SizedVector[A, M], SizedVector[A, N]]): VConcat[A, SizedVector[A, Succ[M]], SizedVector[A, N]] with {
+    given vconsConcat[A, M <: Nat, N <: Nat](using ctail: VConcat[A, M, N]): VConcat[A, Succ[M], N] with {
       type MN = Succ[ctail.MN]
 
       def apply(xs: SizedVector[A, Succ[M]], ys: SizedVector[A, N]): Out = xs.head :: (xs.tail ++ ys)
     }
   }
-
-  val l1 = 1 :: 2 :: 3 :: VNil
-
-  val h: Int = l1.head
-  val t = l1.tail
-
-  println(l1.tail.tail)
-//      println(l1.tail.tail.tail.head)
 
 }

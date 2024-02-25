@@ -1,6 +1,6 @@
 package workshop
 
-import scala.compiletime.ops.int.{+}
+import scala.compiletime.ops.int.+
 import scala.compiletime.ops.string.{CharAt, Length, Substring}
 
 object TypeSafePrintf {
@@ -15,6 +15,6 @@ object TypeSafePrintf {
             case 's' => String *: ArgTypes[Substring[S, 2, Length[S]]]
         case _ => ArgTypes[Substring[S, 1, Length[S]]]
 
-  def printf(s: String)(t: ArgTypes[s.type]): Unit = ()
+  def tsPrintf(s: String)(t: ArgTypes[s.type]): Unit = ()
 
 }
