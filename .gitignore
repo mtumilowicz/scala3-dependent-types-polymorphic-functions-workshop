@@ -4,3 +4,5 @@
 /target/
 /target/scala-3.4.0/classes/
 /target/scala-3.4.0/test-classes/
+/.bsp
+/.idea
