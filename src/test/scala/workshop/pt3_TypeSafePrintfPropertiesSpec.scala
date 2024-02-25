@@ -3,10 +3,10 @@ package workshop
 import org.scalacheck.Prop.forAll
 import org.scalacheck.Properties
 import org.scalatest.Assertions.{assertCompiles, assertDoesNotCompile}
-import workshop.TypeSafePrintf.*
+import workshop.pt3_TypeSafePrintf.*
 
 
-object TypeSafePrintfPropertiesSpec extends Properties("TypeSafePrintf")  {
+object pt3_TypeSafePrintfPropertiesSpec extends Properties("TypeSafePrintf")  {
 
   property("supports %s %d format") = forAll { (s: String, i: Int) =>
     tsPrintf("%s is %d")(s, i)

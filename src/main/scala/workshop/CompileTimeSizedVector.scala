@@ -1,5 +1,0 @@
-package workshop
-
-object CompileTimeSizedVector {
-
-}

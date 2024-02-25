@@ -1,9 +1,9 @@
 package workshop
 
-import workshop.SafeHead.Nat.{Succ, _0}
-import workshop.SafeHead.SizedVector.{NonEmpty, VNil}
+import workshop.pt2_SafeHead.Nat.{Succ, _0}
+import workshop.pt2_SafeHead.SizedVector.{NonEmpty, VNil}
 
-object SafeHead extends App {
+object pt2_SafeHead extends App {
 
   sealed trait Nat
 

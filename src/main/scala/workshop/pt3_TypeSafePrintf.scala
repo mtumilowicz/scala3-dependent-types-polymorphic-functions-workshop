@@ -3,7 +3,7 @@ package workshop
 import scala.compiletime.ops.int.+
 import scala.compiletime.ops.string.{CharAt, Length, Substring}
 
-object TypeSafePrintf {
+object pt3_TypeSafePrintf {
 
   type ArgTypes[S <: String] <: Tuple = S match
     case "" => EmptyTuple

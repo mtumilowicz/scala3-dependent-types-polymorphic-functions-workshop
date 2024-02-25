@@ -3,10 +3,10 @@ package workshop
 import org.scalatest.Assertions.{assertCompiles, assertDoesNotCompile}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import workshop.SafeHead.{Nat, SizedVector}
-import workshop.SafeHead.SizedVector.VNil
+import workshop.pt2_SafeHead.{Nat, SizedVector}
+import workshop.pt2_SafeHead.SizedVector.VNil
 
-class SafeHeadPropertiesSpec extends AnyFlatSpec with Matchers {
+class pt2SafeHeadPropertiesSpec extends AnyFlatSpec with Matchers {
 
   it should "should not compile if size is wrong" in {
     assertDoesNotCompile("val l1: NonEmpty[Int, Succ[_0]] = 1 :: 2 :: 3 :: VNil")
