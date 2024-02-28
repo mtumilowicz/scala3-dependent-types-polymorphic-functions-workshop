@@ -3,6 +3,7 @@ package workshop
 object pt4_pathDependent extends App {
 
   trait Blueprint
+
   enum ComplianceCheckResult {
     case Violations(data: List[String])
 
