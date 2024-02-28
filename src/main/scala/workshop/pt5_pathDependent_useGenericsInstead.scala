@@ -30,8 +30,10 @@ object pt5_pathDependent_useGenericsInstead extends App {
     }
   }
 
-  trait Specification[Target <: Blueprint] {
+
+  trait Specification[Target <: Blueprint, Result] {
     def prepare(): Target
+    def x(): Result
   }
 
   case class Transaction(amount: Double, merchant: String) extends Blueprint
@@ -48,13 +50,13 @@ object pt5_pathDependent_useGenericsInstead extends App {
 
   class ApprovalRecommendationEngine {
 
-    def check[B <: Blueprint](compliancePolicy: CompliancePolicy[B],
-              spec: Specification[B]
-             ): ApprovalRecommendation = {
+    def check[B <: Blueprint, R](compliancePolicy: CompliancePolicy[B],
+              spec: Specification[B, R]
+             ): R = {
       val blueprint = spec.prepare()
       compliancePolicy(spec.prepare()) match
-        case ComplianceCheckResult.Violations(data) => ApprovalRecommendation.Reject
-        case ComplianceCheckResult.NoViolationFound => ApprovalRecommendation.Approve
+        case ComplianceCheckResult.Violations(data) => spec.x()
+        case ComplianceCheckResult.NoViolationFound => spec.x()
     }
 
   }
@@ -63,9 +65,11 @@ object pt5_pathDependent_useGenericsInstead extends App {
   val transactionLimitPolicy = new FraudCheckPolicy {
     def isSuspicious(transaction: Transaction): Boolean = transaction.amount > 1000.0
   }
-  val transactionSpecification = new Specification[Transaction] {
+  val transactionSpecification = new Specification[Transaction, String] {
 
     def prepare(): Transaction = Transaction(amount = 1001.0, merchant = "")
+
+    override def x(): String = "a"
   }
 
   val result = approvalRecommendationEngine.check(transactionLimitPolicy, transactionSpecification)
