@@ -2,6 +2,17 @@ package workshop
 
 import workshop.pt4_pathDependent.ComplianceCheckResult.NoViolationFound
 
+// ZIO ZIP
+
+// example with CountDownLatch {type S; protected def updateState S => S; def countdown: UIO[Unit]; def onDone: UIO[Unit]}
+// ZIO Schedule[-Env, -In, +Out] // putting state will make it complex, as State can be really long WindowRecurEvery5SecondsEtc
+  // we don't need to know what it is to work with schedule
+  // why not trait? because u want to keep in the same
+// generally improves type inference (invariance)
+// exposing implementation detail
+  // Box {type A; def value A} box(1).value + box(2).value
+  // Aux pattern, enables adding - explicit when I need that type and when I don't
+    // u can always forget about it val a: Wrapper = previouslyCreatedWithAux
 object pt4_pathDependent extends App {
 
   trait Blueprint
