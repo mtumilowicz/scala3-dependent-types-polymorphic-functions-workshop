@@ -1,5 +1,7 @@
 package workshop
 
+import workshop.pt4_pathDependent.ComplianceCheckResult.NoViolationFound
+
 object pt4_pathDependent extends App {
 
   trait Blueprint
@@ -42,21 +44,23 @@ object pt4_pathDependent extends App {
     case Approve, Reject, ManualCheck
   }
 
-  trait ComplianceHeuristicEngine {
-    type B <: Blueprint
-
+  trait ComplianceHeuristicEngine[-B <: Blueprint] {
     def apply(blueprint: B): ComplianceCheckResult
   }
 
   class ApprovalRecommendationEngine {
 
     def check(compliancePolicy: CompliancePolicy,
-              spec: Specification {type Target <: compliancePolicy.B}
+              spec: Specification {type Target <: compliancePolicy.B},
+              heuristicEngine: ComplianceHeuristicEngine[compliancePolicy.B]
              ): ApprovalRecommendation = {
       val blueprint = spec.prepare()
-      compliancePolicy(spec.prepare()) match
+      compliancePolicy(blueprint) match
         case ComplianceCheckResult.Violations(data) => ApprovalRecommendation.Reject
-        case ComplianceCheckResult.NoViolationFound => ApprovalRecommendation.Approve
+        case ComplianceCheckResult.NoViolationFound =>
+          heuristicEngine(blueprint) match
+            case ComplianceCheckResult.Violations(data) => ApprovalRecommendation.Reject
+            case ComplianceCheckResult.NoViolationFound => ApprovalRecommendation.ManualCheck
     }
 
   }
@@ -70,8 +74,12 @@ object pt4_pathDependent extends App {
 
     def prepare(): Target = Transaction(amount = 1001.0, merchant = "")
   }
+  val transactionHeuristicsPolicy = new ComplianceHeuristicEngine[Transaction] {
 
-  val result = approvalRecommendationEngine.check(transactionLimitPolicy, transactionSpecification)
+    override def apply(blueprint: Transaction): ComplianceCheckResult = NoViolationFound
+  }
+
+  val result = approvalRecommendationEngine.check(transactionLimitPolicy, transactionSpecification, transactionHeuristicsPolicy)
 
   println(result) // Output: NoViolationFound
 
