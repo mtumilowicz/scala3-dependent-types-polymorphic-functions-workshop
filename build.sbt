@@ -8,6 +8,7 @@ lazy val root = (project in file("."))
   )
 
 // Add ScalaCheck dependency
+libraryDependencies += "dev.zio" %% "zio" % "2.0.21"
 libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.17.0" % Test
 
 // Optional: If you want to use ScalaTest as well
