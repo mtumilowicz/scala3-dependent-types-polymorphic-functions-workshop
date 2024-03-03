@@ -3,7 +3,7 @@ package workshop
 import scala.language.postfixOps
 import scala.util.NotGiven
 
-object pt6_proofs extends App {
+object pt6_LogicProofs extends App {
 
   type Not[P] = P => Nothing
   type Or[P, Q] = Either[P, Q]
