@@ -1,9 +1,12 @@
 * references
-    * https://github.com/milessabin/strangeloop-2013/tree/master
     * ["Scala vs Idris: Dependent types, now and in the future" by Miles Sabin and Edwin Brady (2013)](https://www.youtube.com/watch?v=fV2no1Rkzdw)
-    * https://github.com/mbovel/scalacon-typelevel-operations
     * [Type level Programming in Scala - Matt Bovel](https://www.youtube.com/watch?v=B7uficxARKM)
     * [Why Netflix ❤'s Scala for Machine Learning - Jeremy Smith & Aish](https://www.youtube.com/watch?v=BfaBeT0pRe0)
+    * [Zymposium — Path Dependent Types](https://www.youtube.com/watch?v=w2rcHCqdn-o)
+    * [f(by) 2020: Dependent types, Vitaly Bragilevsky](https://www.youtube.com/watch?v=ohG-PRwOorA)
+    * https://github.com/milessabin/strangeloop-2013/tree/master
+    * https://github.com/mbovel/scalacon-typelevel-operations
+    * https://github.com/hablapps/syllogisms
     * https://docs.scala-lang.org/sips/42.type.html
     * https://dotty.epfl.ch/api/scala/Singleton.html
     * https://mypy.readthedocs.io/en/stable/literal_types.html#
@@ -261,45 +264,128 @@ to use:
     * to make any use of type members, programmers need a way to refer to them
         * some level of dependent types is required
         * usual notion is that of path-dependent types
+* problem: path dependent type is really hidden
+    ```
+    trait Wrapper {
+      type A
 
-// ZIO ZIP
+      def value: A
+    }
 
-// example with CountDownLatch {type S; protected def updateState S => S; def countdown: UIO[Unit]; def onDone: UIO[Unit]}
-// ZIO Schedule[-Env, -In, +Out] // putting state will make it complex, as State can be really long WindowRecurEvery5SecondsEtc
-// we don't need to know what it is to work with schedule
-// why not trait? because u want to keep in the same
-// generally improves type inference (invariance)
-// exposing implementation detail
-// Box {type A; def value A} box(1).value + box(2).value
-// Aux pattern, enables adding - explicit when I need that type and when I don't
-// u can always forget about it val a: Wrapper = previouslyCreatedWithAux
-* spark pipes
-    * example1
-        trait TransformFunction[In, Out] {
-            def andThen[In2, Out2](next: TransformFunction[In2, Out2])
-            (using c: SchemaComposition[In, Out, In2, Out2]) : TransformFunction[c.CombinedIn, c.CombinedOut]
+    object Wrapper {
+
+      def apply[A0](a: A0): Wrapper =
+        new Wrapper {
+          type A = A0
+          def value: A0 = a
         }
-        example
-        val first: TransformFunction[A with B, C]
-        val second: TransformFunction[B with C with D, E with F]
+    }
 
-        val result: TransformFunction[A with B with D, C with E with F] = first andThen second
-    * example2: search for standard transform functions that can provide missing columns needed
-        trait TransformFunction[In, Out] {
-            def adapted[S](using adapt: AdaptTransform[In, S]): adapt.Out
-        }
+    val w = Wrapper(1)
+    val z = w.value + w.value
+    ```
+    * solution: `Aux` pattern
+        ```
+        object Wrapper {
 
-        sealed trait B extends Col[B]
-        object B extends B {
-            // given A and C, B can be derived with a known transform
-            // also provides a bonus E column
-            given provide: ColProvider[B, A with C, B with E]
+          type Aux[A0] = Wrapper { type A = A0 }
+          def apply[A0](a: A0): Wrapper.Aux[A0] =
+            new Wrapper {
+              type A = A0
+              def value: A0 = a
+            }
         }
 
-        val fn: TransformFunction[A with B with C, D]
-        val data: Dataset[A with C]
+        val w = Wrapper(1) // type is Wrapper.Aux[Int]
+        val z = w.value + w.value
+        ```
+    * notice that it can always be forgotten when not needed
+        ```
+        val w: Wrapper = Wrapper(1) // Wrapper.Aux[Int] is also Wrapper
+        ```
+* examples
+    1. hiding internal state: `ZIO Schedule[-Env, -In, +Out]`
+        ```
+        trait Schedule[-Env, -In, +Out] extends Serializable { self =>
+          import Schedule.Decision._
+          import Schedule._
 
-        val result: Dataset[A with B with C with D with E] = fn.adapted(data)
+          type State
+
+          def initial: State
+        ```
+        * reason: putting state will make it complex
+            * state can be really long like window recur every 5 seconds etc
+            * we don't need to know what it is to work with schedule
+                * exposing it means exposing implementation detail
+        * why not use trait
+            * we want to keep it the same in every referred place
+        * source: https://github.com/zio/zio/blob/series/2.x/core/shared/src/main/scala/zio/Schedule.scala
+    1. hiding out
+        1. reducing complexity by hiding `Out` type: ZIO Zippable`
+            * `Out` types can be very complex, and usually caller has zero interest in them
+            * problem: flattening tuple
+                * sometime it is valuable to have: `(("a", "b"), "c")` ~ `("a", "b", "c")` ~ `("a", ("b", "c"))`
+                * example
+                    ```
+                      val zio1: ZIO[Any, Nothing, Int] = ZIO.succeed(1)
+                      val zio2: ZIO[Any, Nothing, Int] = ZIO.succeed(2)
+                      val zio3: ZIO[Any, Nothing, Int] = ZIO.succeed(3)
+
+                      val zio1_4: ZIO[Any, Nothing, ((Int, Int), Int)] = zio1 <*> zio2 <*> zio3 // ZIO 1, not flattened tuple
+                      val zio2_4: ZIO[Any, Nothing, (Int, Int, Int)] = zio1 <*> zio2 <*> zio3 // ZIO 2: no tuples nesting
+                    ```
+                * problem: it is still not resolved systematically
+                    ```
+                    val zio1 = ZIO.succeed(1)
+                    val zio2 = ZIO.succeed((2, 3))
+                    val zio3 = ZIO.succeed(3)
+
+                    Schedule
+
+                    val zio4: ZIO[Any, Nothing, (Int, (Int, Int), Int)] = zio1 <*> zio2 <*> zio3 // ZIO 2: tuples nesting
+                    ```
+            * source: https://github.com/zio/zio/blob/series/2.x/core/shared/src/main/scala/zio/Zippable.scala
+        1. spark pipes
+            * problem: composing transformations
+                ```
+                // given
+                val first: TransformFunction[A with B, C]
+                val second: TransformFunction[B with C with D, E with F]
+
+                // we would like to have function that requires all required `ins` and returns all produced `outs`
+                val result: TransformFunction[A with B with D, C with E with F] = first andThen second
+                ```
+                * solution: combining in typeclass and using path dependent types
+                    ```
+                    trait TransformFunction[In, Out] {
+                        def andThen[In2, Out2](next: TransformFunction[In2, Out2])
+                        (using c: SchemaComposition[In, Out, In2, Out2]) : TransformFunction[c.CombinedIn, c.CombinedOut]
+                    }
+                    ```
+            * problem: performing operations on validated datasets in typesafe manner
+                ```
+                // given
+                val fn: TransformFunction[A with B with C, D]
+                val data: Dataset[A with C]
+
+                // and
+                sealed trait B extends Col[B]
+                object B extends B {
+                    // given A and C, B can be derived with a known transform
+                    // also provides a bonus E column
+                    given provide: ColProvider[B, A with C, B with E]
+                }
+
+                // we would like to have
+                val result: Dataset[A with B with C with D with E] = fn.adapted(data)
+                ```
+                * solution: combining in typeclass and using path dependent types
+                ```
+                trait TransformFunction[In, Out] {
+                    def adapted[S](using adapt: AdaptTransform[In, S]): adapt.Out
+                }
+                ```
 
 ## Curry-Howard isomorphism
 
