@@ -16,6 +16,7 @@
 * https://www.doubloin.com/learn/formal-verification-smart-contracts
 * https://ethereum.org/en/developers/docs/smart-contracts/formal-verification/
 * https://www.certik.com/resources/blog/3UDUMVAMia8ZibM7EmPf9f-what-is-formal-verification
+* https://lampwww.epfl.ch/~amin/dot/fpdt.pdf
 
 to use:
 * https://stackoverflow.com/questions/12935731/any-reason-why-scala-does-not-explicitly-support-dependent-types/12937819#12937819
@@ -172,6 +173,12 @@ to use:
 
 
 ## path dependent types
+* Scala unifies concepts from object and module systems
+    * essential ingredient of this unification is to support objects that contain type members in addition to
+    fields and methods
+    * to make any use of type members, programmers need a way to refer to them
+        * some level of dependent types is required
+        * usual notion is that of path-dependent types
 
 ## Curry-Howard isomorphism
 
