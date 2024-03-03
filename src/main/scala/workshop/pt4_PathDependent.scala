@@ -99,5 +99,5 @@ object Example extends App {
 
   val result = approvalRecommendationEngine.check(transactionSpecification, transactionLimitPolicy, transactionHeuristicsPolicy)
 
-  println(result) // Output: NoViolationFound
+  println(result)
 }
