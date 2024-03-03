@@ -3,12 +3,146 @@
 * https://github.com/mbovel/scalacon-typelevel-operations
 * [Type level Programming in Scala - Matt Bovel](https://www.youtube.com/watch?v=B7uficxARKM)
 * [Why Netflix ❤'s Scala for Machine Learning - Jeremy Smith & Aish](https://www.youtube.com/watch?v=BfaBeT0pRe0)
-
+* https://docs.scala-lang.org/sips/42.type.html
+* https://dotty.epfl.ch/api/scala/Singleton.html
+* https://mypy.readthedocs.io/en/stable/literal_types.html#
+* https://chat.openai.com
+* https://github.com/goldfirere/singletons
+* https://stackoverflow.com/questions/46748559/i-need-help-haskell-inhabitant-for-the-type
+* https://typesandkinds.wordpress.com/2013/12/17/singletons-v0-9-released/
+* https://www.poberezkin.com/posts/2020-05-17-using-dependent-types-haskell-singletons.html
+* https://dl.acm.org/doi/10.1145/2364506.2364522
+* https://stackoverflow.com/questions/12961651/why-not-be-dependently-typed
+* https://www.doubloin.com/learn/formal-verification-smart-contracts
+* https://ethereum.org/en/developers/docs/smart-contracts/formal-verification/
+* https://www.certik.com/resources/blog/3UDUMVAMia8ZibM7EmPf9f-what-is-formal-verification
 
 to use:
 * https://stackoverflow.com/questions/12935731/any-reason-why-scala-does-not-explicitly-support-dependent-types/12937819#12937819
 * https://stackoverflow.com/questions/24960722/what-is-the-difference-between-path-dependent-types-and-dependent-types
 * https://lampwww.epfl.ch/~amin/dot/fpdt.pdf
+
+## prerequisite
+
+
+## singleton types
+* "inhabitant of a type" means an expression which has some given type
+    * example
+        ```
+        val length: String => Int = (s: String) => s.length
+        ```
+* usually types has more than one inhabitant
+    * `Boolean`: two values
+    * `Int`: `[Int.MinValue; Int: MaxValue]`
+    * `String`: infinitely many
+* notice that there are types that has no values
+    * type without any value is the "bottom" type
+    * example: `Function1[String, Nothing]`
+* singleton types = types which have a unique inhabitant
+    * example of standard type that has only one inhabitant: `Unit`
+    * example
+        ```
+        val i: Int = 5
+        val i5: 5 = 5
+        val iType: i.type = i
+        ```
+    * bridge the gap between types and values
+* literal types are also singleton types
+    * literal = an expression is equal to some specific primitive value known at compile time
+* Scala 3
+    * `Singleton` is used by the compiler as a supertype for singleton types
+        * example
+            ```
+            summon[42 <:< Singleton]
+            ```
+    * type inference widens singleton types to the underlying non-singleton type
+        * example
+            ```
+            summon[(42 & Singleton) <:< Int]
+            ```
+    * when a type parameter has an explicit upper bound of `Singleton`, the compiler infers a singleton type
+        * example
+            ```
+            def singletonCheck5[T <: Singleton](x: T)(using ev: T =:= 5): T = x
+            val x = singleCheck42(5) // compiles
+
+            def typeCheck5[T](x: T)(using ev: T =:= 5): T = x
+            val x = typeCheck5(5) // not compiles: cannot prove that Int =:= (5 : Int)
+            ```
+* are a technique for "faking" dependent types in non-dependent languages
+    * good approximation of dependent types
+* bridges the gap in phase separation between runtime values and compile-time types
+    * example
+        ```
+        val stdInputLine: String = scala.io.StdIn.readLine()
+        val inputLine: stdInputLine.type = stdInputLine
+        ```
+* allow programmers to use dependently typed techniques to enforce rich constraints among the types
+    * example: using singletons provably`*` correct sorting algorithm
+        * more accurately, it is a proof of partial correctness
+        * `*` means: sorting algorithm compiles in finite time and when it runs in finite time => result is indeed a sorted list
+
+## dependent types
+* you can write types that depend on terms (calculations)
+    * is enough to specify types about every aspect of your program
+    * means the type system is capable of full program specification
+* problem: can't automatically do type inference
+    * have to write annotations for your program in the form of proofs
+    * solution: one can improve the basic hygiene of one's programs, enforcing additional invariants in types
+        * without going all the way to a full specification
+    * maybe place for AI?
+* dependent types are fundamentally hard
+    * first-order logic is undecidable
+* means that types can depend on values
+    * in other words: values can parameterise types
+* connected to formal verification
+    * formal verification is an automated process that uses mathematical techniques to prove the correctness of the program
+        * can prove that program's business logic meets a predefined specification
+    * formal model is a mathematical description of a computational process
+        * provide a level of abstraction over which analysis of a program's behavior can be evaluated
+    * blockchain context: smart contracts
+        * example
+            ```
+            uint user1Balance;
+            uint user2Balance;
+            uint totalSupply; // = user1Balance + user2Balance
+
+            function transferFromUser1(uint amount) {
+                user1Balance = user1Balance - amount;
+                user2Balance = user2Balance + amount;
+            }
+            ```
+            define program invariants
+            ```
+            // Formula 1: totalSupply = balance1 + balance2
+            ```
+            and translate `transferFromUser1` into formulas true at each point
+            ```
+            function transferFromUser1(uint amount) {
+
+                user1Balance = user1Balance - amount;
+
+                // old(balance1) represents the value of balance1 when entering the function.
+                // Formula 2: totalSupply = old(user1Balance) + user2Balance
+                // Formula 3: user1Balance = old(user1Balance) - amount // implied by the assignment
+                // Formula 4: Formula 2 ^ Formula 3
+
+                user2Balance = user2Balance + amount;
+
+                // old(user2Balance) represents the value of balance2 when entering the function.
+                // Formula 5: (totalSupply = old(user1Balance) + old(user2Balance)) ^
+                //            (user1Balance = old(user1Balance) - amount)
+                // Formula 6: user2Balance = old(user2Balance) + amount   // implied by the assignment
+                // Formula 7: Formula 5 ^ Formal 6
+            }
+            ```
+            proof that `transferFromUser1` maintains the program invariant
+
+
+## path dependent types
+
+## Curry-Howard isomorphism
+
 
 * spark pipes
     * example1
