@@ -23,14 +23,11 @@ object pt4_pathDependent extends App {
     case NoViolationFound
   }
 
-  trait CompliancePolicy {
-    type B <: Blueprint
-
+  trait CompliancePolicy[-B <: Blueprint] {
     def apply(blueprint: B): ComplianceCheckResult
   }
 
-  trait FraudCheckPolicy extends CompliancePolicy {
-    type B = Transaction
+  trait FraudCheckPolicy extends CompliancePolicy[Transaction] {
 
     def isSuspicious(transaction: Transaction): Boolean
 
@@ -61,9 +58,9 @@ object pt4_pathDependent extends App {
 
   class ApprovalRecommendationEngine {
 
-    def check(compliancePolicy: CompliancePolicy,
-              spec: Specification {type Target <: compliancePolicy.B},
-              heuristicEngine: ComplianceHeuristicEngine[compliancePolicy.B]
+    def check(spec: Specification, 
+              compliancePolicy: CompliancePolicy[spec.Target],
+              heuristicEngine: ComplianceHeuristicEngine[spec.Target]
              ): ApprovalRecommendation = {
       val blueprint = spec.prepare()
       compliancePolicy(blueprint) match
@@ -90,7 +87,7 @@ object pt4_pathDependent extends App {
     override def apply(blueprint: Transaction): ComplianceCheckResult = NoViolationFound
   }
 
-  val result = approvalRecommendationEngine.check(transactionLimitPolicy, transactionSpecification, transactionHeuristicsPolicy)
+  val result = approvalRecommendationEngine.check(transactionSpecification, transactionLimitPolicy, transactionHeuristicsPolicy)
 
   println(result) // Output: NoViolationFound
 
