@@ -1,7 +1,7 @@
 package workshop
 
 import workshop.compliance.*
-import workshop.pt4_PathDependent.{ApprovalRecommendationEngine, Transaction}
+import workshop.pt4_PathDependent.{ApprovalRecommendationEngine, TransactionPlan}
 
 object compliance {
   trait CompliancePolicy {
@@ -42,7 +42,7 @@ trait Blueprint
 
 object pt4_PathDependent {
 
-  case class Transaction(amount: Double, merchant: String) extends Blueprint
+  case class TransactionPlan(amount: Double, merchant: String) extends Blueprint
 
   enum ApprovalRecommendation {
     case Approve, Reject, ManualCheck
@@ -72,9 +72,9 @@ object Example extends App {
   val approvalRecommendationEngine = new ApprovalRecommendationEngine
 
   val transactionLimitPolicy = new CompliancePolicy {
-    override type B = Transaction
+    override type B = TransactionPlan
 
-    def isSuspicious(transaction: Transaction): Boolean = transaction.amount > 1000.0
+    def isSuspicious(transaction: TransactionPlan): Boolean = transaction.amount > 1000.0
 
     override def apply(blueprint: B): ComplianceCheckResult = {
       if (isSuspicious(blueprint)) {
@@ -86,13 +86,13 @@ object Example extends App {
   }
 
   val transactionSpecification = new Specification {
-    override type Target = Transaction
+    override type Target = TransactionPlan
 
-    override def prepare(): Target = Transaction(amount = 1001.0, merchant = "")
+    override def prepare(): Target = TransactionPlan(amount = 999.0, merchant = "")
   }
 
   val transactionHeuristicsPolicy = new ComplianceHeuristicEngine {
-    override type B = Transaction
+    override type B = TransactionPlan
 
     override def apply(blueprint: B): ComplianceCheckResult = ComplianceCheckResult.NoViolationFound
   }
