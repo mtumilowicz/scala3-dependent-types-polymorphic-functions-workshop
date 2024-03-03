@@ -6,13 +6,13 @@ import workshop.pt4_pathDependent.ComplianceCheckResult.NoViolationFound
 
 // example with CountDownLatch {type S; protected def updateState S => S; def countdown: UIO[Unit]; def onDone: UIO[Unit]}
 // ZIO Schedule[-Env, -In, +Out] // putting state will make it complex, as State can be really long WindowRecurEvery5SecondsEtc
-  // we don't need to know what it is to work with schedule
-  // why not trait? because u want to keep in the same
+// we don't need to know what it is to work with schedule
+// why not trait? because u want to keep in the same
 // generally improves type inference (invariance)
 // exposing implementation detail
-  // Box {type A; def value A} box(1).value + box(2).value
-  // Aux pattern, enables adding - explicit when I need that type and when I don't
-    // u can always forget about it val a: Wrapper = previouslyCreatedWithAux
+// Box {type A; def value A} box(1).value + box(2).value
+// Aux pattern, enables adding - explicit when I need that type and when I don't
+// u can always forget about it val a: Wrapper = previouslyCreatedWithAux
 object pt4_pathDependent extends App {
 
   trait Blueprint
@@ -23,21 +23,10 @@ object pt4_pathDependent extends App {
     case NoViolationFound
   }
 
-  trait CompliancePolicy[-B <: Blueprint] {
+  trait CompliancePolicy {
+    type B <: Blueprint
+
     def apply(blueprint: B): ComplianceCheckResult
-  }
-
-  trait FraudCheckPolicy extends CompliancePolicy[Transaction] {
-
-    def isSuspicious(transaction: Transaction): Boolean
-
-    def apply(blueprint: Transaction): ComplianceCheckResult = {
-      if (isSuspicious(blueprint)) {
-        ComplianceCheckResult.Violations(List("Fraud detected"))
-      } else {
-        ComplianceCheckResult.NoViolationFound
-      }
-    }
   }
 
   trait Specification {
@@ -54,14 +43,15 @@ object pt4_pathDependent extends App {
 
   trait ComplianceHeuristicEngine {
     type B <: Blueprint
+
     def apply(blueprint: B): ComplianceCheckResult
   }
 
   class ApprovalRecommendationEngine {
 
-    def check(spec: Specification, 
-              compliancePolicy: CompliancePolicy[spec.Target],
-              heuristicEngine: ComplianceHeuristicEngine { type B = spec.Target }
+    def check(spec: Specification,
+              compliancePolicy: CompliancePolicy {type B = spec.Target},
+              heuristicEngine: ComplianceHeuristicEngine {type B = spec.Target}
              ): ApprovalRecommendation = {
       val blueprint = spec.prepare()
       compliancePolicy(blueprint) match
@@ -75,8 +65,19 @@ object pt4_pathDependent extends App {
   }
 
   val approvalRecommendationEngine = new ApprovalRecommendationEngine
-  val transactionLimitPolicy = new FraudCheckPolicy {
-    def isSuspicious(transaction: Transaction): Boolean = transaction.amount > 1000.0
+
+  val transactionLimitPolicy = new CompliancePolicy {
+    override type B = Transaction
+
+    def isSuspicious(transaction: B): Boolean = transaction.amount > 1000.0
+
+    def apply(blueprint: Transaction): ComplianceCheckResult = {
+      if (isSuspicious(blueprint)) {
+        ComplianceCheckResult.Violations(List("Fraud detected"))
+      } else {
+        ComplianceCheckResult.NoViolationFound
+      }
+    }
   }
   val transactionSpecification = new Specification {
     type Target = Transaction
