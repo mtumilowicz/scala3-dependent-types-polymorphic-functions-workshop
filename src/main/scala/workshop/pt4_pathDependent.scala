@@ -52,7 +52,8 @@ object pt4_pathDependent extends App {
     case Approve, Reject, ManualCheck
   }
 
-  trait ComplianceHeuristicEngine[-B <: Blueprint] {
+  trait ComplianceHeuristicEngine {
+    type B <: Blueprint
     def apply(blueprint: B): ComplianceCheckResult
   }
 
@@ -60,7 +61,7 @@ object pt4_pathDependent extends App {
 
     def check(spec: Specification, 
               compliancePolicy: CompliancePolicy[spec.Target],
-              heuristicEngine: ComplianceHeuristicEngine[spec.Target]
+              heuristicEngine: ComplianceHeuristicEngine { type B = spec.Target }
              ): ApprovalRecommendation = {
       val blueprint = spec.prepare()
       compliancePolicy(blueprint) match
@@ -82,9 +83,10 @@ object pt4_pathDependent extends App {
 
     def prepare(): Target = Transaction(amount = 1001.0, merchant = "")
   }
-  val transactionHeuristicsPolicy = new ComplianceHeuristicEngine[Transaction] {
+  val transactionHeuristicsPolicy = new ComplianceHeuristicEngine {
+    override type B = Transaction
 
-    override def apply(blueprint: Transaction): ComplianceCheckResult = NoViolationFound
+    override def apply(blueprint: B): ComplianceCheckResult = NoViolationFound
   }
 
   val result = approvalRecommendationEngine.check(transactionSpecification, transactionLimitPolicy, transactionHeuristicsPolicy)
