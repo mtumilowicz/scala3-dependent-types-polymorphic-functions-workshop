@@ -21,10 +21,10 @@
     * https://ethereum.org/en/developers/docs/smart-contracts/formal-verification/
     * https://www.certik.com/resources/blog/3UDUMVAMia8ZibM7EmPf9f-what-is-formal-verification
     * https://lampwww.epfl.ch/~amin/dot/fpdt.pdf
+    * https://stackoverflow.com/questions/24960722/what-is-the-difference-between-path-dependent-types-and-dependent-types
 
 to use:
 * https://stackoverflow.com/questions/12935731/any-reason-why-scala-does-not-explicitly-support-dependent-types/12937819#12937819
-* https://stackoverflow.com/questions/24960722/what-is-the-difference-between-path-dependent-types-and-dependent-types
 
 ## preface
 * goals of this workshop
@@ -264,7 +264,9 @@ to use:
     * to make any use of type members, programmers need a way to refer to them
         * some level of dependent types is required
         * usual notion is that of path-dependent types
-* problem: path dependent type is really hidden
+* path dependent type is a specific kind of dependent type in which the type depends on a path
+* types which are distinguished by the values which are their prefixes
+* problem: path dependent type is effectively hidden
     ```
     trait Wrapper {
       type A
