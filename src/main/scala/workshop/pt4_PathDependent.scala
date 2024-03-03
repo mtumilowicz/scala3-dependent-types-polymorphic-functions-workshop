@@ -1,12 +1,9 @@
 package workshop
 
-import workshop.pt4_PathDependent.ComplianceCheckResult.NoViolationFound
+import workshop.compliance.*
+import workshop.pt4_PathDependent.{ApprovalRecommendationEngine, Transaction}
 
-object pt4_PathDependent extends App {
-
-  trait Blueprint
-  case class Transaction(amount: Double, merchant: String) extends Blueprint
-
+object compliance {
   trait CompliancePolicy {
     type B <: Blueprint
 
@@ -14,19 +11,13 @@ object pt4_PathDependent extends App {
   }
 
   object CompliancePolicy {
-    type Aux[B0] = CompliancePolicy { type B = B0 }
+    type Aux[B0] = CompliancePolicy {type B = B0}
   }
 
   enum ComplianceCheckResult {
     case Violations(data: List[String])
 
     case NoViolationFound
-  }
-
-  trait Specification {
-    type Target <: Blueprint
-
-    def prepare(): Target
   }
 
   trait ComplianceHeuristicEngine {
@@ -38,6 +29,20 @@ object pt4_PathDependent extends App {
   object ComplianceHeuristicEngine {
     type Aux[B0] = ComplianceHeuristicEngine {type B = B0}
   }
+
+}
+
+trait Specification {
+  type Target <: Blueprint
+
+  def prepare(): Target
+}
+
+trait Blueprint
+
+object pt4_PathDependent {
+
+  case class Transaction(amount: Double, merchant: String) extends Blueprint
 
   enum ApprovalRecommendation {
     case Approve, Reject, ManualCheck
@@ -60,6 +65,10 @@ object pt4_PathDependent extends App {
 
   }
 
+}
+
+object Example extends App {
+
   val approvalRecommendationEngine = new ApprovalRecommendationEngine
 
   val transactionLimitPolicy = new CompliancePolicy {
@@ -75,19 +84,20 @@ object pt4_PathDependent extends App {
       }
     }
   }
-  val transactionSpecification = new Specification {
-    type Target = Transaction
 
-    def prepare(): Target = Transaction(amount = 1001.0, merchant = "")
+  val transactionSpecification = new Specification {
+    override type Target = Transaction
+
+    override def prepare(): Target = Transaction(amount = 999.0, merchant = "")
   }
+
   val transactionHeuristicsPolicy = new ComplianceHeuristicEngine {
     override type B = Transaction
 
-    override def apply(blueprint: B): ComplianceCheckResult = NoViolationFound
+    override def apply(blueprint: B): ComplianceCheckResult = ComplianceCheckResult.NoViolationFound
   }
 
   val result = approvalRecommendationEngine.check(transactionSpecification, transactionLimitPolicy, transactionHeuristicsPolicy)
 
   println(result) // Output: NoViolationFound
-
 }
