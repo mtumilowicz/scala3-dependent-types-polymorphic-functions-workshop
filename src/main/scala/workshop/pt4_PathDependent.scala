@@ -5,12 +5,7 @@ import workshop.pt4_PathDependent.ComplianceCheckResult.NoViolationFound
 object pt4_PathDependent extends App {
 
   trait Blueprint
-
-  enum ComplianceCheckResult {
-    case Violations(data: List[String])
-
-    case NoViolationFound
-  }
+  case class Transaction(amount: Double, merchant: String) extends Blueprint
 
   trait CompliancePolicy {
     type B <: Blueprint
@@ -22,16 +17,16 @@ object pt4_PathDependent extends App {
     type Aux[B0] = CompliancePolicy { type B = B0 }
   }
 
+  enum ComplianceCheckResult {
+    case Violations(data: List[String])
+
+    case NoViolationFound
+  }
+
   trait Specification {
     type Target <: Blueprint
 
     def prepare(): Target
-  }
-
-  case class Transaction(amount: Double, merchant: String) extends Blueprint
-
-  enum ApprovalRecommendation {
-    case Approve, Reject, ManualCheck
   }
 
   trait ComplianceHeuristicEngine {
@@ -42,6 +37,10 @@ object pt4_PathDependent extends App {
 
   object ComplianceHeuristicEngine {
     type Aux[B0] = ComplianceHeuristicEngine {type B = B0}
+  }
+
+  enum ApprovalRecommendation {
+    case Approve, Reject, ManualCheck
   }
 
   class ApprovalRecommendationEngine {
