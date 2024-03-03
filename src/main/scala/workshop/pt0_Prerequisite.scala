@@ -16,7 +16,7 @@ object pt0_Prerequisite extends App {
   summon[i.type <:< Singleton]
   summon[42 <:< Singleton]
   summon[(42 & Singleton) <:< Int]
-  //  implicitly[Int <:< Singleton]
+//    summon[Int <:< Singleton]
 
   val x: String = scala.io.StdIn.readLine()
   val zzz: x.type = x
@@ -51,7 +51,7 @@ object pt0_Prerequisite extends App {
       }
   }
 
-  val w: Wrapper = Wrapper(1)
+  val w = Wrapper(1) // val w: Wrapper = Wrapper(1)
 //  val z = w.value + w.value
 
 }
