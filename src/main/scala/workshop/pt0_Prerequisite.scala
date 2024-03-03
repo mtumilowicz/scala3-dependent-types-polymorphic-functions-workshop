@@ -13,18 +13,14 @@ object pt0_Prerequisite extends App {
   //  yType = iType
   //  yType = y.type
 
-  implicitly[i.type <:< Singleton]
-  implicitly[42 <:< Singleton]
+  summon[i.type <:< Singleton]
+  summon[42 <:< Singleton]
+  summon[(42 & Singleton) <:< Int]
   //  implicitly[Int <:< Singleton]
 
-  // Singleton types, types which have a unique inhabitant
-  // Singleton is used by the compiler as a supertype for singleton types
-  // This includes literal types, as they are also singleton types.
-  // Literal types let you indicate that an expression is equal to some specific primitive value.
-  // by pairing a type with its unique inhabitant, singleton types bridge the gap between types and values
-
-  // Normally, type inference in Scala widens singleton types to the underlying non-singleton type.
-  // When a type parameter has an explicit upper bound of Singleton, the compiler infers a singleton type.
+  val x: String = scala.io.StdIn.readLine()
+  val zzz: x.type = x
+  println(zzz)
 
   def singleCheck42[T <: Singleton](x: T)(using ev: T =:= 5): T = x
 
@@ -32,7 +28,7 @@ object pt0_Prerequisite extends App {
   println(x2)
 
   def check42[T](x: T)(using ev: T =:= 5): T = x
-  //  val x1 = check42(5)
+//    val x1 = check42(5)
 
   // trait Schedule[-Env, -In, +Out] - state is hidden, WithState
   // trait Zippable[-A, -B] - out is hidden
