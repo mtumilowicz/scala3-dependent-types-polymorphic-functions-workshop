@@ -29,6 +29,10 @@ object pt4_pathDependent extends App {
     def apply(blueprint: B): ComplianceCheckResult
   }
 
+  object CompliancePolicy {
+    type Aux[B0] = CompliancePolicy { type B = B0 }
+  }
+
   trait Specification {
     type Target <: Blueprint
 
@@ -47,11 +51,15 @@ object pt4_pathDependent extends App {
     def apply(blueprint: B): ComplianceCheckResult
   }
 
+  object ComplianceHeuristicEngine {
+    type Aux[B0] = ComplianceHeuristicEngine {type B = B0}
+  }
+
   class ApprovalRecommendationEngine {
 
     def check(spec: Specification,
-              compliancePolicy: CompliancePolicy {type B = spec.Target},
-              heuristicEngine: ComplianceHeuristicEngine {type B = spec.Target}
+              compliancePolicy: CompliancePolicy.Aux[spec.Target],
+              heuristicEngine: ComplianceHeuristicEngine.Aux[spec.Target]
              ): ApprovalRecommendation = {
       val blueprint = spec.prepare()
       compliancePolicy(blueprint) match
