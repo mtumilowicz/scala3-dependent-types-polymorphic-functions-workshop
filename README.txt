@@ -4,6 +4,7 @@
     * [Why Netflix ❤'s Scala for Machine Learning - Jeremy Smith & Aish](https://www.youtube.com/watch?v=BfaBeT0pRe0)
     * [Zymposium — Path Dependent Types](https://www.youtube.com/watch?v=w2rcHCqdn-o)
     * [f(by) 2020: Dependent types, Vitaly Bragilevsky](https://www.youtube.com/watch?v=ohG-PRwOorA)
+    * [Stephan Boyer - What are Dependent Types - λC 2017](https://www.youtube.com/watch?v=FquVty-Ghpg)
     * https://github.com/milessabin/strangeloop-2013/tree/master
     * https://github.com/mbovel/scalacon-typelevel-operations
     * https://github.com/hablapps/syllogisms
@@ -22,9 +23,15 @@
     * https://www.certik.com/resources/blog/3UDUMVAMia8ZibM7EmPf9f-what-is-formal-verification
     * https://lampwww.epfl.ch/~amin/dot/fpdt.pdf
     * https://stackoverflow.com/questions/24960722/what-is-the-difference-between-path-dependent-types-and-dependent-types
-
-to use:
-* https://stackoverflow.com/questions/12935731/any-reason-why-scala-does-not-explicitly-support-dependent-types/12937819#12937819
+    * https://users.rust-lang.org/t/concatenating-arrays/89538/2
+    * https://stackoverflow.com/questions/12935731/any-reason-why-scala-does-not-explicitly-support-dependent-types/12937819#12937819
+    * https://www.degruyter.com/document/doi/10.1515/9783110657883-018/html?lang=de
+    * https://kiranvodrahalli.github.io/notes/curry_howard_cos510notes.pdf
+    * https://studenttheses.uu.nl/bitstream/handle/20.500.12932/36496/Thesis%20Jasmijn%20van%20Harskamp.pdf
+    * http://www.ivanociardelli.altervista.org/wp-content/uploads/2017/01/Sorensen-excerpt.pdf
+    * https://softwarefoundations.cis.upenn.edu/lf-current/ProofObjects.html
+    * https://www.quora.com/What-is-an-intuitive-explanation-of-the-Curry-Howard-correspondence
+    * https://cstheory.stackexchange.com/questions/50714/why-is-the-curry-howard-isomorphism
 
 ## preface
 * goals of this workshop
@@ -390,4 +397,41 @@ to use:
                 ```
 
 ## Curry-Howard isomorphism
+* relates systems of formal logic to models of computation
+    * states that proofs correspond to programs and formulae to types
+* is a direct analogy between computer programs and mathematical proofs of program correctness
+* is a proof-theoretic result that establishes a connection between derivations in natural deduction
+and terms in typed lambda calculus
+* inhabited types correspond with logically valid formulas
+    * if we can find the values that exist for a given a type, it turns out that the type corresponds
+    to a true mathematical theorem
+* has practical implications in e.g. program verification
+* useful way to think of types is to view them as predictions
+    * if the expression terminates, you know what form the expression is
+* minimal propositional logic corresponds to simply typed λ-calculus
+* first-order logic corresponds to de- pendent types
+* second-order logic corresponds to polymorphic types
+* has many aspects, even at the syntactic level
+    * formulas correspond to types, proofs correspond to terms
+    * provability corresponds to inhabitation
+    * proof normalization corresponds to term reduction
+* proposes a deep connection between the world of logic and the world of computation:
+    * propositions  ~  types
+    * proofs        ~  data values
+* correspondence links ideas from programming to ideas from logic:
+    * Types correspond to logical formulas (aka propositions)
+    * Programs correspond to logical proofs
+    * Evaluation corresponds to simplification of proofs
+* For example, a logical proof can be thought of as a program that produces a certain type of output, and a computer program can be seen as a proof of a certain logical statement.
+* Both logic and programming with functions are built around the notion of hypotheticals
+    * The proposition 𝐴→𝐵 says "If I had an 𝐴, I could prove 𝐵." A function of type 𝐴→𝐵 says "If I had a value of type 𝐴, I could compute a value of type 𝐵.
+    * these logics/languages are really systems for hypothetical reasoning, which we need for both programming and proving.
+    * Whether we say "prove" or "compute" really just depends on whether we only care about the existence of an 𝐵, or whether we care about which 𝐵 we get.
+* In some sense, the Curry-Howard isomorphism isn't an isomorphism at all, and some people prefer the word "correspondence".
+    * But depending on your view, it's not "two things that are isomorphic" but "two different views of the same thing."
+* propositions as types
+    * function type = implication
+    * product type = conjunction
+    * sum type = disjunction
+    * inhabited types = provable theorems
 
