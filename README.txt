@@ -91,10 +91,42 @@ to use:
     * solution: one can improve the basic hygiene of one's programs, enforcing additional invariants in types
         * without going all the way to a full specification
     * maybe place for AI?
-* dependent types are fundamentally hard
+* are fundamentally hard
     * first-order logic is undecidable
 * means that types can depend on values
     * in other words: values can parameterise types
+    * example: Idris - https://tio.run/#idris
+        ```
+        data Vect : Nat -> Type -> Type where
+          Nil : Vect Z a
+          (::) : a -> Vect n a -> Vect (plus 1 n) a -- (plus 1 n) same as (S n)
+
+        concat : Vect n a -> Vect m a -> Vect (n + m) a
+        concat Nil ys = ys
+        concat (x :: xs) ys = x :: concat xs ys
+
+        head : Vect (plus 1 n) a -> a
+        head (x :: xs) = x
+
+        v0 : Vect 0 a
+        v0 = Nil
+        v3 : Vect 3 Integer
+        v3 = 10 :: 5 :: 1 :: Nil
+        v4 : Vect 4 Integer
+        v4 = 1 :: 2 :: 3 :: 4 :: Nil
+
+        v3v4 : Vect 7 Integer
+        v3v4 = concat v3 v4
+
+        v3Head : Integer
+        v3Head = head v3
+
+        -- v0Head: Integer
+        -- v0Head = head v0 -- not compiling, there is no function head for 0-sized vector
+
+        main : IO ()
+        main = putStrLn $ "head of v1: " ++ show v3Head
+        ```
 * connected to formal verification
     * formal verification is an automated process that uses mathematical techniques to prove the correctness of the program
         * can prove that program's business logic meets a predefined specification
