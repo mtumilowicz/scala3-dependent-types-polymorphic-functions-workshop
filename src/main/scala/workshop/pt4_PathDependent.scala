@@ -59,8 +59,8 @@ object pt4_PathDependent {
         case ComplianceCheckResult.Violations(data) => ApprovalRecommendation.Reject
         case ComplianceCheckResult.NoViolationFound =>
           heuristicEngine(blueprint) match
-            case ComplianceCheckResult.Violations(data) => ApprovalRecommendation.Reject
-            case ComplianceCheckResult.NoViolationFound => ApprovalRecommendation.ManualCheck
+            case ComplianceCheckResult.Violations(data) => ApprovalRecommendation.ManualCheck
+            case ComplianceCheckResult.NoViolationFound => ApprovalRecommendation.Approve
     }
 
   }
@@ -74,9 +74,9 @@ object Example extends App {
   val transactionLimitPolicy = new CompliancePolicy {
     override type B = Transaction
 
-    def isSuspicious(transaction: B): Boolean = transaction.amount > 1000.0
+    def isSuspicious(transaction: Transaction): Boolean = transaction.amount > 1000.0
 
-    override def apply(blueprint: Transaction): ComplianceCheckResult = {
+    override def apply(blueprint: B): ComplianceCheckResult = {
       if (isSuspicious(blueprint)) {
         ComplianceCheckResult.Violations(List("Fraud detected"))
       } else {
@@ -88,7 +88,7 @@ object Example extends App {
   val transactionSpecification = new Specification {
     override type Target = Transaction
 
-    override def prepare(): Target = Transaction(amount = 999.0, merchant = "")
+    override def prepare(): Target = Transaction(amount = 1001.0, merchant = "")
   }
 
   val transactionHeuristicsPolicy = new ComplianceHeuristicEngine {
