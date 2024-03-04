@@ -1,7 +1,5 @@
 package workshop
 
-import workshop.pt0_Prerequisite.Wrapper.Aux
-
 object pt0_Prerequisite extends App {
 
   val i: Int = 5
@@ -29,11 +27,6 @@ object pt0_Prerequisite extends App {
 
   def check42[T](x: T)(using ev: T =:= 5): T = x
 //    val x1 = check42(5)
-
-  // trait Schedule[-Env, -In, +Out] - state is hidden, WithState
-  // trait Zippable[-A, -B] - out is hidden
-  //  val a: ZIO[Any, Nothing, (Int, Int, Int)] = ZIO.succeed((1, 2)) <*> ZIO.succeed(3)
-  //  val a: ZIO[Any, Nothing, (Int, Int, (Int, Int))] = ZIO.succeed((1, 2)) <*> ZIO.succeed((3, 4))
 
   trait Wrapper {
     type A

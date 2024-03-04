@@ -1,7 +1,6 @@
 package workshop
 
 import scala.language.postfixOps
-import scala.util.NotGiven
 
 object pt6_LogicProofs extends App {
 
