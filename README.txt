@@ -69,16 +69,12 @@
                     }
 
                     fn main() {
-                        // Generate two arrays
                         let array1: [i32; 3] = [1, 2, 3];
                         let array2: [i32; 2] = [4, 5];
 
-                        // Invoke the concat_arrays function
                         let result_array: [i32; 5] = concat_arrays(array1, array2);
 
-                        // Print the result
                         println!("{:?}", result_array);
-                        println!("Hello, world!");
                     }
                     ```
         * task: implement collection that tracks its size at compile time
