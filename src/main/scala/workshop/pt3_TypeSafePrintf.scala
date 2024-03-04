@@ -1,6 +1,5 @@
 package workshop
 
-import scala.compiletime.ops.int.+
 import scala.compiletime.ops.string.{CharAt, Length, Substring}
 
 object pt3_TypeSafePrintf {
