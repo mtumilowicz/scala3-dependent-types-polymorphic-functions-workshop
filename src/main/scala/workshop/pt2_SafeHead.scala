@@ -3,6 +3,8 @@ package workshop
 import workshop.pt2_SafeHead.Nat.{Succ, _0}
 import workshop.pt2_SafeHead.SizedVector.{NonEmpty, VNil}
 
+import scala.compiletime.ops.int.+
+
 object pt2_SafeHead extends App {
 
   sealed trait Nat
