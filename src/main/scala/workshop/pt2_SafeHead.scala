@@ -13,18 +13,14 @@ object pt2_SafeHead extends App {
     class Succ[Prev <: Nat] extends Nat
   }
 
-  sealed trait SizedVector[+A, N <: Nat] {
-    xs =>
+  enum SizedVector[+A, N <: Nat] { xs =>
+    case NonEmpty(head: A, tail: SizedVector[A, N]) extends SizedVector[A, Succ[N]]
+    case VNil extends SizedVector[Nothing, _0]
+
     def ::[B >: A](x: B): NonEmpty[B, N] = NonEmpty(x, xs)
   }
 
   object SizedVector {
-
-    case class NonEmpty[+A, N <: Nat](head: A, tail: SizedVector[A, N]) extends SizedVector[A, Succ[N]]
-
-    type VNil = SizedVector[Nothing, _0]
-
-    case object VNil extends VNil
 
     given [A, N <: Nat]: Conversion[SizedVector[A, Succ[N]], NonEmpty[A, N]] = {
       case ne@NonEmpty(head, tail) => ne // input has: Succ[N] = N + 1 as size so it's not empty
