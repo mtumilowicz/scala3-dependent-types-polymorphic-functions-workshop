@@ -5,6 +5,7 @@
     * [Zymposium — Path Dependent Types](https://www.youtube.com/watch?v=w2rcHCqdn-o)
     * [f(by) 2020: Dependent types, Vitaly Bragilevsky](https://www.youtube.com/watch?v=ohG-PRwOorA)
     * [Stephan Boyer - What are Dependent Types - λC 2017](https://www.youtube.com/watch?v=FquVty-Ghpg)
+    * [Guillaume Martres - Polymorphic Function Types in Scala 3](https://www.youtube.com/watch?v=sauaDZ-1-zM)
     * https://github.com/milessabin/strangeloop-2013/tree/master
     * https://github.com/mbovel/scalacon-typelevel-operations
     * https://github.com/hablapps/syllogisms
