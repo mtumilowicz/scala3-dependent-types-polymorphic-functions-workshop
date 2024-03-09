@@ -1,16 +1,12 @@
 package workshop
 
-import workshop.pt1_SizedList.SizedList
 import workshop.pt6_xyz.SList
-import workshop.pt6_xyz.SList.SNil
+import workshop.pt6_xyz.SList.{SCons, SNil}
 
-import scala.compiletime.error
 import scala.compiletime.ops.int.*
 
 
 object pt6_xyz extends App {
-
-
 
   enum SList[N <: Int]:
     self =>
@@ -27,7 +23,9 @@ object pt6_xyz extends App {
       val newTail: SList[1] = SCons(elem, SNil)
       foldRight[[X <: Int] =>> SList[X + 1]](newTail)([M <: Int] => SCons(_, _))
 
-
+    def reverse: SList[N] =
+      foldRight[[X <: Int] =>> SList[X]](SNil)([M <: Int] => (elem, acc) => acc.appended(elem))
 
   println(SList.SCons("a", SNil).appended("b"))
+  println(SList.SCons("a", SCons("b", SNil)).reverse)
 }
