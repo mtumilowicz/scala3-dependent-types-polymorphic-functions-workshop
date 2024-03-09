@@ -8,11 +8,11 @@ import workshop.pt1_SizedList.*
 class pt1_SizedListSpec extends AnyFlatSpec with Matchers {
 
   it should "should not compile if size is wrong" in {
-    assertDoesNotCompile("val l1: SizedList[0, 0] = 1 :: 2 :: 3 :: SizedList.empty")
-    assertDoesNotCompile("val l1: SizedList[0, 1] = 1 :: 2 :: 3 :: SizedList.empty")
-    assertDoesNotCompile("val l1: SizedList[0, 2] = 1 :: 2 :: 3 :: SizedList.empty")
-    assertDoesNotCompile("val l1: SizedList[0, 4] = 1 :: 2 :: 3 :: SizedList.empty")
-    assertDoesNotCompile("val l1: SizedList[0, 5] = 1 :: 2 :: 3 :: SizedList.empty")
+    assertDoesNotCompile("val l1: SizedList[0, Int] = 1 :: 2 :: 3 :: SizedList.empty")
+    assertDoesNotCompile("val l1: SizedList[1, Int] = 1 :: 2 :: 3 :: SizedList.empty")
+    assertDoesNotCompile("val l1: SizedList[2, Int] = 1 :: 2 :: 3 :: SizedList.empty")
+    assertDoesNotCompile("val l1: SizedList[4, Int] = 1 :: 2 :: 3 :: SizedList.empty")
+    assertDoesNotCompile("val l1: SizedList[5, Int] = 1 :: 2 :: 3 :: SizedList.empty")
   }
 
   it should "should compile if size is correct" in {
