@@ -2,7 +2,7 @@ package workshop
 
 import scala.compiletime.ops.string.{CharAt, Length, Substring}
 
-object pt3_TypeSafePrintf {
+object pt3_TypeSafeFormat extends App {
 
   type ArgTypes[S <: String] <: Tuple = S match
     case "" => EmptyTuple
@@ -14,6 +14,7 @@ object pt3_TypeSafePrintf {
             case 's' => String *: ArgTypes[Substring[S, 2, Length[S]]]
         case _ => ArgTypes[Substring[S, 1, Length[S]]]
 
-  def tsPrintf(s: String)(t: ArgTypes[s.type]): Unit = ()
-
+  def tsFormat(s: String)(t: ArgTypes[s.type]): String =
+    s.format(t.productIterator.toList*)
+  
 }

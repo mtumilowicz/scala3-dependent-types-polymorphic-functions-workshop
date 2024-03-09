@@ -2,9 +2,9 @@ package workshop
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import workshop.pt3_TypeSafePrintf.*
+import workshop.pt3_TypeSafeFormat.*
 
-class pt3_TypeSafePrintfSpec extends AnyFlatSpec with Matchers {
+class pt3_TypeSafeFormatSpec extends AnyFlatSpec with Matchers {
 
   it should "should not compile %s due to EmptyTuple tail" in {
     assertDoesNotCompile("summon[ArgTypes[\"%s\"] =:= (String)]")
@@ -31,22 +31,30 @@ class pt3_TypeSafePrintfSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "compile %s %d format with correctly ordered params" in {
-    assertCompiles("tsPrintf(\"%d is %s\")(5, \"a\")")
+    assertCompiles("tsFormat(\"%d is %s\")(5, \"a\")")
   }
 
   it should "not compile %s %d format with wrong ordered params" in {
-    assertDoesNotCompile("tsPrintf(\"%s %d\")(5, \"a\")")
+    assertDoesNotCompile("tsFormat(\"%s %d\")(5, \"a\")")
   }
 
   it should "not compile %d %s format with wrong ordered params" in {
-    assertDoesNotCompile("tsPrintf(\"%d %s\")(\"a\", 5)")
+    assertDoesNotCompile("tsFormat(\"%d %s\")(\"a\", 5)")
   }
 
   it should "not compile %d %s format with too many params" in {
-    assertDoesNotCompile("tsPrintf(\"%s %d\")(\"a\", 5, 6)")
+    assertDoesNotCompile("tsFormat(\"%s %d\")(\"a\", 5, 6)")
   }
 
   it should "not compile %d %s format with too few params" in {
-    assertDoesNotCompile("tsPrintf(\"%s %d\")(\"a\")")
+    assertDoesNotCompile("tsFormat(\"%s %d\")(\"a\")")
+  }
+
+  it should "correctly format text" in {
+    val name = "Mika"
+    val surname = "Tumi"
+    val age = 20
+    val expected = s"hello $name: your surname is $surname and your age is $age"
+    tsFormat("hello %s: your surname is %s and your age is %d")(name, surname, age) shouldBe expected
   }
 }

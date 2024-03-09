@@ -125,17 +125,17 @@
                 main : IO ()
                 main = putStrLn $ "head of v1: " ++ show v3Head
                 ```
-    1. `pt3_TypeSafePrintf`
-        * implement type safe version of `printf` that validates arguments based on specified types
+    1. `pt3_TypeSafeFormat`
+        * implement type safe version of `format` that validates arguments based on specified types
             * should support
                 * `%s` -> `String`
                 * `%d` -> `Int`
                 * any arbitrary combination of them with every cardinality > 1
             * example
                 ```
-                tsPrintf("%s is %d")("s1", 1) // compiles
-                tsPrintf("%s %s %s is %d %s")("s1", "s2", "s3", 1, "s4") // compiles
-                tsPrintf("%s is %d")(i, s) // does not compile: Found: (i : Int) Required: String
+                tsFormat("%s is %d")("s1", 1) // compiles
+                tsFormat("%s %s %s is %d %s")("s1", "s2", "s3", 1, "s4") // compiles
+                tsFormat("%s is %d")(i, s) // does not compile: Found: (i : Int) Required: String
                 ```
         * explain why cardinality == 1 is complicating a bit implementation
     1. `pt4_pathDependent`
