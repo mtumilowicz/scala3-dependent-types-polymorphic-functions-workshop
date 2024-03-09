@@ -123,6 +123,8 @@
                     main : IO ()
                     main = putStrLn $ "head of v1: " ++ show v3Head
                     ```                                    
+    1. `pt2_SList`
+        * why normal foldRight is not enough? types are not good
     1. `pt3_TypeSafeFormat`
         * implement type safe version of `format` that validates arguments based on specified types
             * should support
