@@ -1,6 +1,7 @@
 package workshop
 
-import scala.compiletime.ops.int.{<, >}
+import scala.compiletime.ops.boolean.&&
+import scala.compiletime.ops.int.{+, <, >}
 import scala.compiletime.ops.string.Length
 
 object pt0_Prerequisite extends App {
@@ -14,23 +15,11 @@ object pt0_Prerequisite extends App {
   //  yType = iType
   //  yType = y.type
 
-
-  trait Proof[-P]
-  given Proof[1 > -1] with {}
-
-
-  // Example usage
-  val result: Char = "aaa".charAt(1)
-
-  // should work without Proof
-  def charAt(s: String, i: Int)(using Proof[i.type > -1], Proof[i.type < Length[s.type]]): Char = s.charAt(i)
-
-  println(charAt("aa", 1))
-
   summon[i.type <:< Singleton]
   summon[42 <:< Singleton]
   summon[(42 & Singleton) <:< Int]
-//    summon[Int <:< Singleton]
+  summon[(5 > 0) =:= true]
+  //    summon[Int <:< Singleton]
 
 //  val x: String = scala.io.StdIn.readLine()
 //  val zzz: x.type = x
