@@ -80,51 +80,49 @@
                     ```
         * task: implement collection that tracks its size at compile time
             * use case: allow us to create matrices of a known size and check at compile time that they are multipliable
-            * implement method to concatenate two collections
-    1. `pt2_SafeHead`
-        * context: rust
-            * arrays validate indices at compile time
-                * example
+            * implement safe version of `head` (fails compilation if invoked on empty list)
+            * example
+                * rust
+                    * example
+                        ```
+                        fn main() {
+                            let array1: [i32; 0] = [];
+                    
+                            let head = array1[0]; // does not compile: index out of bounds: the length is 0 but the index is 0
+                        }
+                        ```
+                * idris - https://tio.run/#idris
                     ```
-                    fn main() {
-                        let array1: [i32; 0] = [];
-
-                        let head = array1[0]; // does not compile: index out of bounds: the length is 0 but the index is 0
-                    }
-                    ```
-        * task: leverage previous task to support `.head` function that can be invoked only on non-empty list
-            * example: Idris - https://tio.run/#idris
-                ```
-                data Vect : Nat -> Type -> Type where
-                  Nil : Vect Z a
-                  (::) : a -> Vect n a -> Vect (plus 1 n) a -- (plus 1 n) same as (S n)
-
-                concat : Vect n a -> Vect m a -> Vect (n + m) a
-                concat Nil ys = ys
-                concat (x :: xs) ys = x :: concat xs ys
-
-                head : Vect (plus 1 n) a -> a
-                head (x :: xs) = x
-
-                v0 : Vect 0 a
-                v0 = Nil
-                v3 : Vect 3 Integer
-                v3 = 10 :: 5 :: 1 :: Nil
-                v4 : Vect 4 Integer
-                v4 = 1 :: 2 :: 3 :: 4 :: Nil
-
-                v3v4 : Vect 7 Integer
-                v3v4 = concat v3 v4
-
-                v3Head : Integer
-                v3Head = head v3
-
-                -- v0Head: Integer
-                -- v0Head = head v0 -- not compiling, there is no function head for 0-sized vector
-
-                main : IO ()
-                main = putStrLn $ "head of v1: " ++ show v3Head
-                ```
+                    data Vect : Nat -> Type -> Type where
+                      Nil : Vect Z a
+                      (::) : a -> Vect n a -> Vect (plus 1 n) a -- (plus 1 n) same as (S n)
+    
+                    concat : Vect n a -> Vect m a -> Vect (n + m) a
+                    concat Nil ys = ys
+                    concat (x :: xs) ys = x :: concat xs ys
+    
+                    head : Vect (plus 1 n) a -> a
+                    head (x :: xs) = x
+    
+                    v0 : Vect 0 a
+                    v0 = Nil
+                    v3 : Vect 3 Integer
+                    v3 = 10 :: 5 :: 1 :: Nil
+                    v4 : Vect 4 Integer
+                    v4 = 1 :: 2 :: 3 :: 4 :: Nil
+    
+                    v3v4 : Vect 7 Integer
+                    v3v4 = concat v3 v4
+    
+                    v3Head : Integer
+                    v3Head = head v3
+    
+                    -- v0Head: Integer
+                    -- v0Head = head v0 -- not compiling, there is no function head for 0-sized vector
+    
+                    main : IO ()
+                    main = putStrLn $ "head of v1: " ++ show v3Head
+                    ```                                    
     1. `pt3_TypeSafeFormat`
         * implement type safe version of `format` that validates arguments based on specified types
             * should support
