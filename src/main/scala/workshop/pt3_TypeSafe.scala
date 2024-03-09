@@ -1,9 +1,16 @@
 package workshop
 
-import scala.compiletime.ops.string.{CharAt, Length, Substring}
+import scala.compiletime.ops.int.*
+import scala.compiletime.ops.string.*
 
-object pt3_TypeSafeFormat extends App {
+object pt3_TypeSafe extends App {
 
+  type Proof[A <: Boolean] = A =:= true
+
+  def tsCharAt(s: String, i: Int)(using Proof[i.type > -1],
+                                Proof[i.type < Length[s.type]],
+  ): Char = s.charAt(i)
+  
   type ArgTypes[S <: String] <: Tuple = S match
     case "" => EmptyTuple
     case _ =>
@@ -16,5 +23,5 @@ object pt3_TypeSafeFormat extends App {
 
   def tsFormat(s: String)(t: ArgTypes[s.type]): String =
     s.format(t.productIterator.toList*)
-  
+
 }
