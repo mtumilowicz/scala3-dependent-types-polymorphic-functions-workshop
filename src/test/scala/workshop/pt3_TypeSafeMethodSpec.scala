@@ -2,9 +2,9 @@ package workshop
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import workshop.pt3_TypeSafe.*
+import workshop.pt3_TypeSafeMethod.*
 
-class pt3_TypeSafeSpec extends AnyFlatSpec with Matchers {
+class pt3_TypeSafeMethodSpec extends AnyFlatSpec with Matchers {
 
   it should "tsFormat: should not compile %s due to EmptyTuple tail" in {
     assertDoesNotCompile("summon[ArgTypes[\"%s\"] =:= (String)]")

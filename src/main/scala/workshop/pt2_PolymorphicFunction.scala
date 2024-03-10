@@ -2,7 +2,7 @@ package workshop
 
 import scala.compiletime.ops.int.+
 
-object pt2_PolymorphicFunctions {
+object pt2_PolymorphicFunction {
   enum SList[N <: Int] {
     self =>
     case SNil extends SList[0]

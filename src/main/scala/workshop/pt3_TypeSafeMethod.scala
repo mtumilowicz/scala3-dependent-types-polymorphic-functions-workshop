@@ -3,7 +3,7 @@ package workshop
 import scala.compiletime.ops.int.*
 import scala.compiletime.ops.string.*
 
-object pt3_TypeSafe extends App {
+object pt3_TypeSafeMethod extends App {
 
   type Proof[A <: Boolean] = A =:= true
 
