@@ -87,7 +87,7 @@
                         ```
                         fn main() {
                             let array1: [i32; 0] = [];
-                    
+
                             let head = array1[0]; // does not compile: index out of bounds: the length is 0 but the index is 0
                         }
                         ```
@@ -96,33 +96,33 @@
                     data Vect : Nat -> Type -> Type where
                       Nil : Vect Z a
                       (::) : a -> Vect n a -> Vect (plus 1 n) a -- (plus 1 n) same as (S n)
-    
+
                     concat : Vect n a -> Vect m a -> Vect (n + m) a
                     concat Nil ys = ys
                     concat (x :: xs) ys = x :: concat xs ys
-    
+
                     head : Vect (plus 1 n) a -> a
                     head (x :: xs) = x
-    
+
                     v0 : Vect 0 a
                     v0 = Nil
                     v3 : Vect 3 Integer
                     v3 = 10 :: 5 :: 1 :: Nil
                     v4 : Vect 4 Integer
                     v4 = 1 :: 2 :: 3 :: 4 :: Nil
-    
+
                     v3v4 : Vect 7 Integer
                     v3v4 = concat v3 v4
-    
+
                     v3Head : Integer
                     v3Head = head v3
-    
+
                     -- v0Head: Integer
                     -- v0Head = head v0 -- not compiling, there is no function head for 0-sized vector
-    
+
                     main : IO ()
                     main = putStrLn $ "head of v1: " ++ show v3Head
-                    ```                                    
+                    ```
     1. `pt2_SList`
         * why normal foldRight is not enough? types are not good
     1. `pt3_TypeSafeFormat`
@@ -203,6 +203,8 @@
     * example: using singletons provably`*` correct sorting algorithm
         * more accurately, it is a proof of partial correctness
         * `*` means: sorting algorithm compiles in finite time and when it runs in finite time => result is indeed a sorted list
+
+## polymorphic functions
 
 ## dependent types
 * you can write types that depend on terms (calculations)
