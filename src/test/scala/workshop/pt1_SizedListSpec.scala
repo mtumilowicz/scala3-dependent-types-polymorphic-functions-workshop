@@ -7,7 +7,7 @@ import workshop.pt1_SizedList.*
 
 class pt1_SizedListSpec extends AnyFlatSpec with Matchers {
 
-  it should "should not compile if size is wrong" in {
+  it should "not compile if size is wrong" in {
     assertDoesNotCompile("val l1: SizedList[0, Int] = 1 :: 2 :: 3 :: SizedList.empty")
     assertDoesNotCompile("val l1: SizedList[1, Int] = 1 :: 2 :: 3 :: SizedList.empty")
     assertDoesNotCompile("val l1: SizedList[2, Int] = 1 :: 2 :: 3 :: SizedList.empty")
@@ -15,7 +15,7 @@ class pt1_SizedListSpec extends AnyFlatSpec with Matchers {
     assertDoesNotCompile("val l1: SizedList[5, Int] = 1 :: 2 :: 3 :: SizedList.empty")
   }
 
-  it should "should compile if size is correct" in {
+  it should "compile if size is correct" in {
     assertCompiles("val l1: SizedList[0, Int] = SizedList.empty[Int]")
     assertCompiles("val l1: SizedList[1, Int] = 1 :: SizedList.empty")
     assertCompiles("val l1: SizedList[2, Int] = 1 :: 2 :: SizedList.empty")
@@ -23,19 +23,19 @@ class pt1_SizedListSpec extends AnyFlatSpec with Matchers {
     assertCompiles("val l1: SizedList[4, Int] = 1 :: 2 :: 3 :: 4 :: SizedList.empty")
   }
 
-  it should "should not compile if calling head on empty" in {
+  it should "not compile if calling head on empty" in {
     assertDoesNotCompile("val l1 = SizedList.empty; l1.head")
   }
 
-  it should "should compile if calling head on non empty" in {
+  it should "compile if calling head on non empty" in {
     assertCompiles("val l1 = 1 :: SizedList.empty; l1.head")
   }
 
-  it should "should not compile if calling head on empty after operations" in {
+  it should "not compile if calling head on empty after operations" in {
     assertDoesNotCompile("val l1 = 1 :: 2 :: SizedList.empty; l1.tail.tail.head")
   }
 
-  it should "should not compile if calling tail on empty after operations" in {
+  it should "not compile if calling tail on empty after operations" in {
     assertDoesNotCompile("val l1 = 1 :: 2 :: SizedList.empty; l1.tail.tail.tail")
   }
 
