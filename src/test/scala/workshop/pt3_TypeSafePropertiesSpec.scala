@@ -1,7 +1,7 @@
 package workshop
 
 import org.scalacheck.Prop.forAll
-import org.scalacheck.{Arbitrary, Gen, Properties}
+import org.scalacheck.Properties
 import org.scalatest.Assertions.{assertCompiles, assertDoesNotCompile}
 import workshop.pt3_TypeSafe.*
 
