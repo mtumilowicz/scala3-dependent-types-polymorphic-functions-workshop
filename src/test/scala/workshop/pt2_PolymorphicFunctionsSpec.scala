@@ -3,10 +3,10 @@ package workshop
 import org.scalatest.Assertions.{assertCompiles, assertDoesNotCompile}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import workshop.pt2_SList.*
-import workshop.pt2_SList.SList.*
+import workshop.pt2_PolymorphicFunctions.*
+import workshop.pt2_PolymorphicFunctions.SList.*
 
-class pt2_SListSpec extends AnyFlatSpec with Matchers {
+class pt2_PolymorphicFunctionsSpec extends AnyFlatSpec with Matchers {
 
   it should "should not compile if size is wrong" in {
     assertDoesNotCompile("val l1: SList[0] = 1 :: 2 :: 3 :: SNil")
@@ -29,7 +29,7 @@ class pt2_SListSpec extends AnyFlatSpec with Matchers {
     (1 :: 2 :: 3 :: SNil).reverse shouldBe (3 :: 2 :: 1 :: SNil)
     (1 :: 2 :: SNil).reverse shouldBe (2 :: 1 :: SNil)
     (1 :: SNil).reverse shouldBe (1 :: SNil)
-    (SNil).reverse shouldBe (SNil)
+    SNil.reverse shouldBe SNil
   }
 
 }
