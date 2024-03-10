@@ -4,12 +4,8 @@ ThisBuild / scalaVersion := "3.4.0"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "scala3-dependent-types-workshop"
+    name := "scala3-dependent-types-polymorphic-functions-workshop"
   )
 
-// Add ScalaCheck dependency
-libraryDependencies += "dev.zio" %% "zio" % "2.0.21"
 libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.17.0" % Test
-
-// Optional: If you want to use ScalaTest as well
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.17" % Test
