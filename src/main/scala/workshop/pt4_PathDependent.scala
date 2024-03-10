@@ -66,38 +66,3 @@ object pt4_PathDependent {
   }
 
 }
-
-object Example extends App {
-
-  val approvalRecommendationEngine = new ApprovalRecommendationEngine
-
-  val transactionLimitPolicy = new CompliancePolicy {
-    override type B = TransactionPlan
-
-    def isSuspicious(transaction: TransactionPlan): Boolean = transaction.amount > 1000.0
-
-    override def apply(blueprint: B): ComplianceCheckResult = {
-      if (isSuspicious(blueprint)) {
-        ComplianceCheckResult.Violations(List("Fraud detected"))
-      } else {
-        ComplianceCheckResult.NoViolationFound
-      }
-    }
-  }
-
-  val transactionSpecification = new Specification {
-    override type Target = TransactionPlan
-
-    override def prepare(): Target = TransactionPlan(amount = 999.0, merchant = "")
-  }
-
-  val transactionHeuristicsPolicy = new ComplianceHeuristicEngine {
-    override type B = TransactionPlan
-
-    override def apply(blueprint: B): ComplianceCheckResult = ComplianceCheckResult.NoViolationFound
-  }
-
-  val result = approvalRecommendationEngine.check(transactionSpecification, transactionLimitPolicy, transactionHeuristicsPolicy)
-
-  println(result)
-}
