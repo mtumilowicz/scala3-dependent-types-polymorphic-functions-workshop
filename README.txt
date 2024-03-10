@@ -42,6 +42,11 @@
     * https://medium.com/scala-3/scala-3-type-lambdas-polymorphic-function-types-and-dependent-function-types-2a6eabef896d
     * https://blog.rockthejvm.com/scala-3-type-lambdas/
     * https://stackoverflow.com/questions/51131067/when-are-dependent-types-needed-in-shapeless
+    * https://chat.openai.com/
+    * https://medium.com/@Webmarmun/dependent-types-in-haskell-f35b8880cc16
+    * https://medium.com/background-thread/the-future-of-programming-is-dependent-types-programming-word-of-the-day-fcd5f2634878
+    * https://ps.informatik.uni-tuebingen.de/teaching/ws15/pdt/
+    * https://xebia.com/blog/dependent-and-refinement-types-why/
 
 ## preface
 * goals of this workshop
@@ -271,19 +276,40 @@
             * use case: `given Monad[[R] =>> Either[Throwable, R]]`
 
 ## dependent types
-* you can write types that depend on terms (calculations)
-    * is enough to specify types about every aspect of your program
-    * means the type system is capable of full program specification
+* gradation
+    * values depending on values: functions
+    * values depending on types: classes
+    * types depending on types: type functions
+    * types depending on values: dependent types
+* dependent type systems: "values may also appear in types"
+* question of how to enforce invariants has two answers in dependent types
+    * intrinsic
+        * implies that a “wrong” value cannot be constructed at all
+        * example
+            ```
+            -- Agda intrinsic
+            get :: (xs : List a l) -> Fin l -> a // Fin is a type defined in such a way that it can only take values from 0 up to n - 1
+            ```
+    * extrinsic
+        * allow any input, but then require an additional proof of the fact that input is within constraints
+        * more similar to a refinement
+        * example
+            ```
+            -- Agda extrinsic
+            get :: (xs : List a l) -> (n : Nat) -> (inBounds n l) -> a
+            ```
+* let you move some checks to the type system itself
+    * making it impossible to fail while the program is running
+* use case: multiplying matrices
+    * problem: `ArrayIndexOutOfBoundsException`
+    * solution: encode matrix size in type and verify if multiply is possible at compile time
 * problem: can't automatically do type inference
-    * have to write annotations for your program in the form of proofs
-    * solution: one can improve the basic hygiene of one's programs, enforcing additional invariants in types
-        * without going all the way to a full specification
     * maybe place for AI?
-* are fundamentally hard
-    * first-order logic is undecidable
-* means that types can depend on values
-    * in other words: values can parameterise types
-* connected to formal verification
+    * archetypal example of the compiler "not being able to see stuff" is the fact that
+    applying reverse twice gives you the original list
+    * have to write annotations for your program in the form of proofs
+        * proposition: enforce additional invariants in types without going all the way to a full specification
+* formal verification context
     * formal verification is an automated process that uses mathematical techniques to prove the correctness of the program
         * can prove that program's business logic meets a predefined specification
     * formal model is a mathematical description of a computational process
@@ -326,7 +352,6 @@
             ```
             proof that `transferFromUser1` maintains the program invariant
 
-
 ## path dependent types
 * Scala unifies concepts from object and module systems
     * essential ingredient of this unification is to support objects that contain type members in addition to
@@ -336,28 +361,15 @@
         * usual notion is that of path-dependent types
 * path dependent type is a specific kind of dependent type in which the type depends on a path
 * types which are distinguished by the values which are their prefixes
-* problem: path dependent type is effectively hidden
-    ```
-    trait Wrapper {
-      type A
-
-      def value: A
-    }
-
-    object Wrapper {
-
-      def apply[A0](a: A0): Wrapper =
-        new Wrapper {
-          type A = A0
-          def value: A0 = a
-        }
-    }
-
-    val w = Wrapper(1)
-    val z = w.value + w.value
-    ```
-    * solution: `Aux` pattern
+* `Aux` pattern
+    * example
         ```
+        trait Wrapper {
+          type A
+
+          def value: A
+        }
+
         object Wrapper {
 
           type Aux[A0] = Wrapper { type A = A0 }
@@ -368,14 +380,12 @@
             }
         }
 
-        val w = Wrapper(1) // type is Wrapper.Aux[Int]
-        val z = w.value + w.value
+        val w: Wrapper = Wrapper(1)
+        val wAux = Wrapper(1) // Wrapper.Aux[Int]
+        val z = wAux.value + wAux.value // ok
+        val z = w.value + w.value // compilation fails, type of value is really hidden
         ```
-    * notice that it can always be forgotten when not needed
-        ```
-        val w: Wrapper = Wrapper(1) // Wrapper.Aux[Int] is also Wrapper
-        ```
-* examples
+* use cases
     1. hiding internal state: `ZIO Schedule[-Env, -In, +Out]`
         ```
         trait Schedule[-Env, -In, +Out] extends Serializable { self =>
@@ -393,77 +403,50 @@
         * why not use trait
             * we want to keep it the same in every referred place
         * source: https://github.com/zio/zio/blob/series/2.x/core/shared/src/main/scala/zio/Schedule.scala
-    1. hiding `out`
-        1. reducing complexity by hiding `Out`
-            * source: https://github.com/zio/zio/blob/series/2.x/core/shared/src/main/scala/zio/Zippable.scala
+    1. type inference & partial application
+        * problem: for generics you can only specify all of them or not specify any of the
+            ```
+            trait Joiner[Elem, R] {
+                def join(xs: Seq[Elem]): R
+            }
+
+            def doJoin[T, R](xs: T*)(using j: Joiner[T, R]): R = j.join(xs)
+
+            given Joiner[CharSequence, String] with {
+              override def join(xs: Seq[CharSequence]): String = xs.mkString
+            }
+
+            given Joiner[String, String] with {
+              override def join(xs: Seq[String]): String = xs.mkString(",")
+            }
+
+            // for Joiner[Elem, R] you can only specify all of them or not specify any of the
+            doJoin[CharSequence, String]("a", "b", "c")
+            doJoin[String, String]("a", "b", "c")
+            doJoin("a", "b", "c")
+            ```
+        * use case: some subset of types is uniquely determined by other types
             * example: ZIO Zippable
-                * `Out` types can be very complex, and usually caller has zero interest in them
-                * problem: flattening tuple
-                    * sometime it is valuable to have: `(("a", "b"), "c")` ~ `("a", "b", "c")` ~ `("a", ("b", "c"))`
+                * source: https://github.com/zio/zio/blob/series/2.x/core/shared/src/main/scala/zio/Zippable.scala
+                * no matter how we zip we should always maintain "flat" structure of tuple
+                    * `((_, _), _)` ~ `(_, (_, _))` ~ `(_, _, _)`
                     * example
                         ```
-                          val zio1: ZIO[Any, Nothing, Int] = ZIO.succeed(1)
-                          val zio2: ZIO[Any, Nothing, Int] = ZIO.succeed(2)
-                          val zio3: ZIO[Any, Nothing, Int] = ZIO.succeed(3)
+                        val zio1: ZIO[Any, Nothing, Int] = ZIO.succeed(1)
+                        val zio2: ZIO[Any, Nothing, Int] = ZIO.succeed(2)
+                        val zio3: ZIO[Any, Nothing, Int] = ZIO.succeed(3)
 
-                          val zio1_4: ZIO[Any, Nothing, ((Int, Int), Int)] = zio1 <*> zio2 <*> zio3 // ZIO 1, not flattened tuple
-                          val zio2_4: ZIO[Any, Nothing, (Int, Int, Int)] = zio1 <*> zio2 <*> zio3 // ZIO 2: no tuples nesting
+                        val zio1_4: ZIO[Any, Nothing, ((Int, Int), Int)] = zio1 <*> zio2 <*> zio3 // ZIO 1: not flattened tuple
+                        val zio2_4: ZIO[Any, Nothing, (Int, Int, Int)] = zio1 <*> zio2 <*> zio3 // ZIO 2: no tuples nesting
                         ```
-                    * problem: it is still not resolved systematically
-                        ```
-                        val zio1 = ZIO.succeed(1)
-                        val zio2 = ZIO.succeed((2, 3))
-                        val zio3 = ZIO.succeed(3)
+                * digression: it cannot be resolved systematically
+                    ```
+                    val zio1 = ZIO.succeed(1)
+                    val zio2 = ZIO.succeed((2, 3))
+                    val zio3 = ZIO.succeed(3)
 
-                        Schedule
-
-                        val zio4: ZIO[Any, Nothing, (Int, (Int, Int), Int)] = zio1 <*> zio2 <*> zio3 // ZIO 2: tuples nesting
-                        ```
-        1. improving type inference
-            * problem: partial application
-                ```
-                trait Joiner[Elem, R] {
-                    def join(xs: Seq[Elem]): R
-                }
-
-                def doJoin[T, R](xs: T*)(using j: Joiner[T, R]): R = j.join(xs)
-
-                given Joiner[CharSequence, String] with {
-                  override def join(xs: Seq[CharSequence]): String = xs.mkString
-                }
-
-                given Joiner[String, String] with {
-                  override def join(xs: Seq[String]): String = xs.mkString(",")
-                }
-
-                // for Joiner[Elem, R] you can only specify all of them or not specify any of the
-                doJoin[CharSequence, String]("a", "b", "c")
-                doJoin[String, String]("a", "b", "c")
-                doJoin("a", "b", "c")
-                ```
-            * solution
-                ```
-                trait Joiner[Elem] {
-                    type R
-                    def join(xs: Seq[Elem]): R
-                }
-
-                def doJoin[T](xs: T*)(using Joiner[T]): j.R = j.join(xs)
-
-                given Joiner[CharSequence] with {
-                    override type R = String
-                  override def join(xs: Seq[CharSequence]): R = xs.mkString
-                }
-
-                given Joiner[String] with {
-                  override type R = String
-                  override def join(xs: Seq[String]): R = xs.mkString(",")
-                }
-
-                doJoin[CharSequence]("a", "b", "c")
-                doJoin[String]("a", "b", "c")
-                doJoin("a", "b", "c")
-                ```
+                    val zio2_4: ZIO[Any, Nothing, (Int, (Int, Int), Int)] = zio1 <*> zio2 <*> zio3 // no implicit for that case
+                    ```
 
 ## Curry-Howard isomorphism
 * relates systems of formal logic to models of computation
