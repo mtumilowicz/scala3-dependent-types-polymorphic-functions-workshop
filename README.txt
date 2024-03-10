@@ -41,6 +41,7 @@
     * https://stackoverflow.com/questions/39905267/what-is-a-kind-projector
     * https://medium.com/scala-3/scala-3-type-lambdas-polymorphic-function-types-and-dependent-function-types-2a6eabef896d
     * https://blog.rockthejvm.com/scala-3-type-lambdas/
+    * https://stackoverflow.com/questions/51131067/when-are-dependent-types-needed-in-shapeless
 
 ## preface
 * goals of this workshop
@@ -163,6 +164,10 @@
             1. (not all S are M) and (all M are P) => not all S are P
 
 ## prerequisite
+* given
+* summon
+* =:=
+* <:<
 
 ## singleton types
 * "inhabitant of a type" means an expression which has some given type
@@ -388,70 +393,76 @@
         * why not use trait
             * we want to keep it the same in every referred place
         * source: https://github.com/zio/zio/blob/series/2.x/core/shared/src/main/scala/zio/Schedule.scala
-    1. hiding out
-        1. reducing complexity by hiding `Out` type: ZIO Zippable`
-            * `Out` types can be very complex, and usually caller has zero interest in them
-            * problem: flattening tuple
-                * sometime it is valuable to have: `(("a", "b"), "c")` ~ `("a", "b", "c")` ~ `("a", ("b", "c"))`
-                * example
-                    ```
-                      val zio1: ZIO[Any, Nothing, Int] = ZIO.succeed(1)
-                      val zio2: ZIO[Any, Nothing, Int] = ZIO.succeed(2)
-                      val zio3: ZIO[Any, Nothing, Int] = ZIO.succeed(3)
-
-                      val zio1_4: ZIO[Any, Nothing, ((Int, Int), Int)] = zio1 <*> zio2 <*> zio3 // ZIO 1, not flattened tuple
-                      val zio2_4: ZIO[Any, Nothing, (Int, Int, Int)] = zio1 <*> zio2 <*> zio3 // ZIO 2: no tuples nesting
-                    ```
-                * problem: it is still not resolved systematically
-                    ```
-                    val zio1 = ZIO.succeed(1)
-                    val zio2 = ZIO.succeed((2, 3))
-                    val zio3 = ZIO.succeed(3)
-
-                    Schedule
-
-                    val zio4: ZIO[Any, Nothing, (Int, (Int, Int), Int)] = zio1 <*> zio2 <*> zio3 // ZIO 2: tuples nesting
-                    ```
+    1. hiding `out`
+        1. reducing complexity by hiding `Out`
             * source: https://github.com/zio/zio/blob/series/2.x/core/shared/src/main/scala/zio/Zippable.scala
-        1. spark pipes
-            * problem: composing transformations
-                ```
-                // given
-                val first: TransformFunction[A with B, C]
-                val second: TransformFunction[B with C with D, E with F]
+            * example: ZIO Zippable
+                * `Out` types can be very complex, and usually caller has zero interest in them
+                * problem: flattening tuple
+                    * sometime it is valuable to have: `(("a", "b"), "c")` ~ `("a", "b", "c")` ~ `("a", ("b", "c"))`
+                    * example
+                        ```
+                          val zio1: ZIO[Any, Nothing, Int] = ZIO.succeed(1)
+                          val zio2: ZIO[Any, Nothing, Int] = ZIO.succeed(2)
+                          val zio3: ZIO[Any, Nothing, Int] = ZIO.succeed(3)
 
-                // we would like to have function that requires all required `ins` and returns all produced `outs`
-                val result: TransformFunction[A with B with D, C with E with F] = first andThen second
-                ```
-                * solution: combining in typeclass and using path dependent types
-                    ```
-                    trait TransformFunction[In, Out] {
-                        def andThen[In2, Out2](next: TransformFunction[In2, Out2])
-                        (using c: SchemaComposition[In, Out, In2, Out2]) : TransformFunction[c.CombinedIn, c.CombinedOut]
-                    }
-                    ```
-            * problem: performing operations on validated datasets in typesafe manner
-                ```
-                // given
-                val fn: TransformFunction[A with B with C, D]
-                val data: Dataset[A with C]
+                          val zio1_4: ZIO[Any, Nothing, ((Int, Int), Int)] = zio1 <*> zio2 <*> zio3 // ZIO 1, not flattened tuple
+                          val zio2_4: ZIO[Any, Nothing, (Int, Int, Int)] = zio1 <*> zio2 <*> zio3 // ZIO 2: no tuples nesting
+                        ```
+                    * problem: it is still not resolved systematically
+                        ```
+                        val zio1 = ZIO.succeed(1)
+                        val zio2 = ZIO.succeed((2, 3))
+                        val zio3 = ZIO.succeed(3)
 
-                // and
-                sealed trait B extends Col[B]
-                object B extends B {
-                    // given A and C, B can be derived with a known transform
-                    // also provides a bonus E column
-                    given provide: ColProvider[B, A with C, B with E]
+                        Schedule
+
+                        val zio4: ZIO[Any, Nothing, (Int, (Int, Int), Int)] = zio1 <*> zio2 <*> zio3 // ZIO 2: tuples nesting
+                        ```
+        1. improving type inference
+            * problem: partial application
+                ```
+                trait Joiner[Elem, R] {
+                    def join(xs: Seq[Elem]): R
                 }
 
-                // we would like to have
-                val result: Dataset[A with B with C with D with E] = fn.adapted(data)
-                ```
-                * solution: combining in typeclass and using path dependent types
-                ```
-                trait TransformFunction[In, Out] {
-                    def adapted[S](using adapt: AdaptTransform[In, S]): adapt.Out
+                def doJoin[T, R](xs: T*)(using j: Joiner[T, R]): R = j.join(xs)
+
+                given Joiner[CharSequence, String] with {
+                  override def join(xs: Seq[CharSequence]): String = xs.mkString
                 }
+
+                given Joiner[String, String] with {
+                  override def join(xs: Seq[String]): String = xs.mkString(",")
+                }
+
+                // for Joiner[Elem, R] you can only specify all of them or not specify any of the
+                doJoin[CharSequence, String]("a", "b", "c")
+                doJoin[String, String]("a", "b", "c")
+                doJoin("a", "b", "c")
+                ```
+            * solution
+                ```
+                trait Joiner[Elem] {
+                    type R
+                    def join(xs: Seq[Elem]): R
+                }
+
+                def doJoin[T](xs: T*)(using Joiner[T]): j.R = j.join(xs)
+
+                given Joiner[CharSequence] with {
+                    override type R = String
+                  override def join(xs: Seq[CharSequence]): R = xs.mkString
+                }
+
+                given Joiner[String] with {
+                  override type R = String
+                  override def join(xs: Seq[String]): R = xs.mkString(",")
+                }
+
+                doJoin[CharSequence]("a", "b", "c")
+                doJoin[String]("a", "b", "c")
+                doJoin("a", "b", "c")
                 ```
 
 ## Curry-Howard isomorphism
