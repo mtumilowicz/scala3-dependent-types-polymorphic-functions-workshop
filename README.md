@@ -1,4 +1,6 @@
 # scala3-dependent-types-polymorphic-functions-workshop
+[![Build Status](https://app.travis-ci.com/mtumilowicz/scala3-dependent-types-workshop.svg?token=PwyvjePQ7aiAX51hSYLE&branch=main)](https://app.travis-ci.com/mtumilowicz/scala3-dependent-types-workshop)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 * references
     * ["Scala vs Idris: Dependent types, now and in the future" by Miles Sabin and Edwin Brady (2013)](https://www.youtube.com/watch?v=fV2no1Rkzdw)
