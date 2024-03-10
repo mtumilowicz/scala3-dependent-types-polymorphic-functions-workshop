@@ -43,10 +43,15 @@
     * https://blog.rockthejvm.com/scala-3-type-lambdas/
     * https://stackoverflow.com/questions/51131067/when-are-dependent-types-needed-in-shapeless
     * https://chat.openai.com/
+    * https://gemini.google.com/
     * https://medium.com/@Webmarmun/dependent-types-in-haskell-f35b8880cc16
     * https://medium.com/background-thread/the-future-of-programming-is-dependent-types-programming-word-of-the-day-fcd5f2634878
     * https://ps.informatik.uni-tuebingen.de/teaching/ws15/pdt/
     * https://xebia.com/blog/dependent-and-refinement-types-why/
+    * https://www.reddit.com/r/ProgrammingLanguages/comments/10f1fr0/basic_building_blocks_of_dependent_type_theory/
+    * https://yarax.medium.com/from-logic-and-math-to-code-for-dummies-part-i-242183267efd
+    * https://en.wikipedia.org/wiki/Liar_paradox
+    * https://yarax.medium.com/from-logic-and-math-to-code-for-dummies-part-ii-higher-order-logic-5db1aa93eb35
 
 ## preface
 * goals of this workshop
@@ -314,43 +319,18 @@
         * can prove that program's business logic meets a predefined specification
     * formal model is a mathematical description of a computational process
         * provide a level of abstraction over which analysis of a program's behavior can be evaluated
-    * blockchain context: smart contracts
-        * example
-            ```
-            uint user1Balance;
-            uint user2Balance;
-            uint totalSupply; // = user1Balance + user2Balance
-
-            function transferFromUser1(uint amount) {
-                user1Balance = user1Balance - amount;
-                user2Balance = user2Balance + amount;
-            }
-            ```
-            define program invariants
-            ```
-            // Formula 1: totalSupply = balance1 + balance2
-            ```
-            and translate `transferFromUser1` into formulas true at each point
-            ```
-            function transferFromUser1(uint amount) {
-
-                user1Balance = user1Balance - amount;
-
-                // old(balance1) represents the value of balance1 when entering the function.
-                // Formula 2: totalSupply = old(user1Balance) + user2Balance
-                // Formula 3: user1Balance = old(user1Balance) - amount // implied by the assignment
-                // Formula 4: Formula 2 ^ Formula 3
-
-                user2Balance = user2Balance + amount;
-
-                // old(user2Balance) represents the value of balance2 when entering the function.
-                // Formula 5: (totalSupply = old(user1Balance) + old(user2Balance)) ^
-                //            (user1Balance = old(user1Balance) - amount)
-                // Formula 6: user2Balance = old(user2Balance) + amount   // implied by the assignment
-                // Formula 7: Formula 5 ^ Formal 6
-            }
-            ```
-            proof that `transferFromUser1` maintains the program invariant
+* use cases
+    1. database queries
+        * type of valid queries depends on the "shape" of the database
+        * type of the result of a query depends on the query itself
+    1. communication protocols
+        * what answer is valid for what message
+    1. binary serialization
+        * all binary formats are described by dependent types
+            * exact meaning and layout of later bytes depend on some earlier bytes
+            * example: uncompressed picture
+                * starts with the size of the picture, number of color channels, bit depth, alignment;
+                followed by the raw data, whose size and interpretation depends on those parameters
 
 ## path dependent types
 * Scala unifies concepts from object and module systems
@@ -449,41 +429,67 @@
                     ```
 
 ## Curry-Howard isomorphism
-* relates systems of formal logic to models of computation
-    * states that proofs correspond to programs and formulae to types
-* is a direct analogy between computer programs and mathematical proofs of program correctness
-* is a proof-theoretic result that establishes a connection between derivations in natural deduction
-and terms in typed lambda calculus
-* inhabited types correspond with logically valid formulas
-    * if we can find the values that exist for a given a type, it turns out that the type corresponds
-    to a true mathematical theorem
-* has practical implications in e.g. program verification
-* useful way to think of types is to view them as predictions
-    * if the expression terminates, you know what form the expression is
-* minimal propositional logic corresponds to simply typed λ-calculus
-* first-order logic corresponds to de- pendent types
-* second-order logic corresponds to polymorphic types
-* has many aspects, even at the syntactic level
-    * formulas correspond to types, proofs correspond to terms
-    * provability corresponds to inhabitation
-    * proof normalization corresponds to term reduction
-* proposes a deep connection between the world of logic and the world of computation:
-    * propositions  ~  types
-    * proofs        ~  data values
-* correspondence links ideas from programming to ideas from logic:
-    * Types correspond to logical formulas (aka propositions)
-    * Programs correspond to logical proofs
-    * Evaluation corresponds to simplification of proofs
-* For example, a logical proof can be thought of as a program that produces a certain type of output, and a computer program can be seen as a proof of a certain logical statement.
-* Both logic and programming with functions are built around the notion of hypotheticals
-    * The proposition 𝐴→𝐵 says "If I had an 𝐴, I could prove 𝐵." A function of type 𝐴→𝐵 says "If I had a value of type 𝐴, I could compute a value of type 𝐵.
-    * these logics/languages are really systems for hypothetical reasoning, which we need for both programming and proving.
-    * Whether we say "prove" or "compute" really just depends on whether we only care about the existence of an 𝐵, or whether we care about which 𝐵 we get.
-* In some sense, the Curry-Howard isomorphism isn't an isomorphism at all, and some people prefer the word "correspondence".
-    * But depending on your view, it's not "two things that are isomorphic" but "two different views of the same thing."
+* proposition refers to a statement or assertion that can be either true or false
+* both logic and programming with functions are built around the notion of hypotheticals
+    * proposition `𝐴→𝐵` says "if I had an 𝐴, I could prove 𝐵"
+    * function of type `𝐴→𝐵` says "if I had a value of type 𝐴, I could compute a value of type 𝐵"
+    * these logics/languages are really systems for hypothetical reasoning, which we need for both programming and proving
+    * whether we say "prove" or "compute" really just depends on whether we only care about
+        * existence of an 𝐵
+        * or which 𝐵 we get
 * propositions as types
     * function type = implication
     * product type = conjunction
     * sum type = disjunction
     * inhabited types = provable theorems
+* relates systems of formal logic to models of computation
+    * proofs correspond to terms (data values / expressions)
+        * example:
+    * formulae to types
+        * useful way to think of types is to view them as predictions
+            * if the expression terminates, you know what form the expression is
+        * provability corresponds to inhabitation
+            * if we can find the values that exist for a given a type, it turns out that the type corresponds
+                to a true mathematical theorem
+    * proof normalization corresponds to term reduction
+        * in other words: evaluation corresponds to simplification of proofs
+* propositional calculus
+    * implication, negation, conjunction, disjunction, exclusive OR and equality
+    * problem: doesn’t know about sets, considering just atomic values
+* first-order logic
+    * extends propositional logic
+        * introduces quantifiers to atomic values
+            * Universal quantification ∀
+            * Existential quantification ∃
+    * corresponds to dependent types
+        * statement: for all x, if x is a student then x has an ID
+            ```
+            trait Student { type Id }
+            ```
+    * is undecidable
+        * Gödel’s incompleteness theorem, which says that even in the formal complete system you can come across with unprovable statements
+            * example: "this sentence is false" is true, then it is false, but the sentence states that it is false, and if it is false, then it must be true, and so on
+* second-order logic
+    * apply quantifiers not only to atomic values but to sets and predicates as well
+        * example: there exists a property that holds for all natural numbers greater than 5
+            * vs FOL: we can say at most that for property P(x) we have: for all natural numbers greater than 5 P(x) holds
+    * corresponds to polymorphic types
+        * statement: ∃ P : Students → Bool, ∀ s : Students, hasPassed(s) = P(s)
+            ```
+            trait StudentPredicate[-A] {
+              def test(student: A): Boolean
+            }
 
+            def hasPassed[A](student: A)(using predicate: StudentPredicate[A]): Boolean =
+              predicate.test(student)
+            ```
+* has practical implications in e.g. program verification
+    * example: proof that `reverse o reverse == identity`
+        * by induction and with lemma `reverse (xs ++ ys) == reverse ys ++ reverse xs`
+    * formal verification is an automated process that uses mathematical techniques to prove the correctness of the program
+        * can prove that program's business logic meets a predefined specification
+    * formal model is a mathematical description of a computational process
+        * provide a level of abstraction over which analysis of a program's behavior can be evaluated
+* in some sense, the Curry-Howard isomorphism isn't an isomorphism at all
+    * some people prefer the word "correspondence"
+    * maybe it's not "two things that are isomorphic" but "two different views of the same thing"
