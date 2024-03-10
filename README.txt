@@ -6,6 +6,7 @@
     * [f(by) 2020: Dependent types, Vitaly Bragilevsky](https://www.youtube.com/watch?v=ohG-PRwOorA)
     * [Stephan Boyer - What are Dependent Types - λC 2017](https://www.youtube.com/watch?v=FquVty-Ghpg)
     * [Guillaume Martres - Polymorphic Function Types in Scala 3](https://www.youtube.com/watch?v=sauaDZ-1-zM)
+    * [Type Members vs Type Parameters - NE Scala 2016](https://www.youtube.com/watch?v=R8GksuRw3VI)
     * https://github.com/milessabin/strangeloop-2013/tree/master
     * https://github.com/mbovel/scalacon-typelevel-operations
     * https://github.com/hablapps/syllogisms
@@ -33,6 +34,13 @@
     * https://softwarefoundations.cis.upenn.edu/lf-current/ProofObjects.html
     * https://www.quora.com/What-is-an-intuitive-explanation-of-the-Curry-Howard-correspondence
     * https://cstheory.stackexchange.com/questions/50714/why-is-the-curry-howard-isomorphism
+    * https://docs.scala-lang.org/scala3/reference/new-types/polymorphic-function-types.html
+    * https://docs.scala-lang.org/scala3/reference/new-types/type-lambdas.html
+    * https://www.baeldung.com/scala/type-lambdas-scala-3
+    * https://github.com/typelevel/kind-projector
+    * https://stackoverflow.com/questions/39905267/what-is-a-kind-projector
+    * https://medium.com/scala-3/scala-3-type-lambdas-polymorphic-function-types-and-dependent-function-types-2a6eabef896d
+    * https://blog.rockthejvm.com/scala-3-type-lambdas/
 
 ## preface
 * goals of this workshop
@@ -124,8 +132,16 @@
                     main = putStrLn $ "head of v1: " ++ show v3Head
                     ```
     1. `pt2_SList`
-        * why normal foldRight is not enough? types are not good
-    1. `pt3_TypeSafeFormat`
+        * implement methods: `append` and `reverse` using `foldRightF`
+            * why normal `foldRight` is not enough?
+                * notice that in classical `foldRight` type of accumulator (`B`) cannot change during processing
+                    ```
+                    trait SList[N <: Int]: // assume that SList has Strings
+                        def foldRight[B](z: B)(op: (String, B) => B): B
+
+                    // SList.foldRight(SNil) { case (elem, acc) => SCons(elem, acc) } // not compiles, SNil is SList[0] and SCons is SList[M]
+                    ```
+    1. `pt3_TypeSafeMethod`
         * implement type safe version of `format` that validates arguments based on specified types
             * should support
                 * `%s` -> `String`
@@ -146,6 +162,7 @@
             1. (all S are M) and (all M are P) => all S are P
             1. (not all S are M) and (all M are P) => not all S are P
 
+## prerequisite
 
 ## singleton types
 * "inhabitant of a type" means an expression which has some given type
@@ -204,7 +221,49 @@
         * more accurately, it is a proof of partial correctness
         * `*` means: sorting algorithm compiles in finite time and when it runs in finite time => result is indeed a sorted list
 
-## polymorphic functions
+## polymorphic lambda
+* is a function type which accepts type parameters
+    * example
+        ```
+        def reverse[A](xs: List[A]): List[A] = xs.reverse // polymorphic method
+        val reverse2: [A] => List[A] => List[A] = [A] => (xs: List[A]) => reverse[A](xs) // polymorphic lambda
+        ```
+* are not to be confused with type lambdas
+    * former describes the type of a polymorphic value
+        * are applied in terms
+    * latter is an actual function value at the type level
+        * are applied in types
+* type lambda
+    * lets one express a higher-kinded type directly, without a type definition
+        * types belong to kinds
+            * think of kinds as types of types
+            * example
+                * `Int` belongs to 0-level kinds
+                * `List[_]` belongs to 1-level kinds
+                    * it takes 0-level kind as type argument
+                    * similar to a function: takes a level-0 type and returns a level-0 type
+                        ```
+                        [X] -> List[X]
+                        ```
+    * example
+        * type definition
+            * unparameterized with a type lambda: `type T = [X] =>> R`
+            * parameterized: `type T[X] = R`
+                * shorthand for an unparameterized definition
+            * unparameterized with a type lambda: `type T = [X] =>> R`
+    * defines a function from types to types
+        * type analog of “value lambdas”
+    * body of a type lambda can again be a type lambda
+        * curried type parameters
+    * before Scala 3, API designers had to resort to compiler plugins, namely kind-projector, to achieve the same level of expressiveness
+        * scala2: doesn’t allow us to use underscore syntax to simply say `Either[Throwable, _]`
+            ```
+            // type projection implementing the same type anonymously (without a name)
+            ({type L[A] = Either[Throwable, A]})#L
+            ```
+        * kind-projector: `Either[Throwable, *]`
+        * scala3: `[K] =>> Either[Throwable, K]`
+            * use case: `given Monad[[R] =>> Either[Throwable, R]]`
 
 ## dependent types
 * you can write types that depend on terms (calculations)
