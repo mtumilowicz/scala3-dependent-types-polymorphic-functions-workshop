@@ -2,7 +2,7 @@ package workshop
 
 import scala.language.postfixOps
 
-object pt6_LogicProofs {
+object pt5_LogicProofs {
 
   type Not[P] = P => Nothing
   type Or[P, Q] = Either[P, Q]
