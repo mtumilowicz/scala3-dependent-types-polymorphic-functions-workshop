@@ -1,3 +1,5 @@
+# scala3-dependent-types-polymorphic-functions-workshop
+
 * references
     * ["Scala vs Idris: Dependent types, now and in the future" by Miles Sabin and Edwin Brady (2013)](https://www.youtube.com/watch?v=fV2no1Rkzdw)
     * [Type level Programming in Scala - Matt Bovel](https://www.youtube.com/watch?v=B7uficxARKM)
@@ -57,6 +59,16 @@
 
 ## preface
 * goals of this workshop
+    * understanding dependent types
+        * comprehension how to apply that in practice based on scala3
+            * singleton types
+            * `=:=`
+            * type level programming
+            * polymorphic functions
+    * understanding path dependent types
+        * applying knowledge in practice
+    * noticing correspondence between logic and computations
+        * formal proofs for basic tautologies
 * workshop plan
     1. `pt1_SizedList`
         * context: rust
