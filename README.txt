@@ -11,7 +11,6 @@
     * https://github.com/mbovel/scalacon-typelevel-operations
     * https://github.com/hablapps/syllogisms
     * https://docs.scala-lang.org/sips/42.type.html
-    * https://dotty.epfl.ch/api/scala/Singleton.html
     * https://mypy.readthedocs.io/en/stable/literal_types.html#
     * https://chat.openai.com
     * https://github.com/goldfirere/singletons
@@ -52,6 +51,9 @@
     * https://yarax.medium.com/from-logic-and-math-to-code-for-dummies-part-i-242183267efd
     * https://en.wikipedia.org/wiki/Liar_paradox
     * https://yarax.medium.com/from-logic-and-math-to-code-for-dummies-part-ii-higher-order-logic-5db1aa93eb35
+    * https://www.stackbuilders.com/blog/reverse-reverse-theorem-proving-with-idris/
+    * https://docs.scala-lang.org/scala3/reference/contextual/using-clauses.html
+    * https://dotty.epfl.ch/api/scala/
 
 ## preface
 * goals of this workshop
@@ -174,10 +176,17 @@
             1. (not all S are M) and (all M are P) => not all S are P
 
 ## prerequisite
-* given
-* summon
-* =:=
-* <:<
+* `summon[T]`
+    * find a given instance of type `T` in the current scope
+* `=:=`
+    * instance of `A =:= B` witnesses that the types `A` and `B` are equal
+    * example: proof of being the same type
+        ```
+        val i = 5 // val i: 5 = 5
+        summon[i.type =:= 5]
+        ```
+* `<:<`
+    * instance of `A <:< B` witnesses that `A` is a subtype of `B`
 
 ## singleton types
 * "inhabitant of a type" means an expression which has some given type
