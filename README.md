@@ -217,17 +217,20 @@
     * type without any value is the "bottom" type
     * example: `Function1[String, Nothing]`
 * singleton types = types which have a unique inhabitant
-    * example of standard type that has only one inhabitant: `Unit`
-    * example
-        ```
-        val i: Int = 5
-        val i5: 5 = 5
-        val iType: i.type = i
-        ```
+    * examples
+        * `Unit` = standard type that has only one inhabitant
+        * literal types = type inhabited by a single constant value known at compile-time (literal)
+            ```
+            val i5: 5 = 5
+            ```
+        * types inhabited by a single term not known at compile-time
+            ```
+            val userInput = StdIn.readInt()
+            val userInput2 = StdIn.readInt()
+            val iInput: userInput.type = userInput
+            val iInput2: userInput2.type = userInput // not compiling, compiles only with `= userInput2`
+            ```
     * bridge the gap between types and values
-* literal types = type inhabited by a single constant value known at compile-time
-    * literal = an expression is equal to some specific primitive value known at compile time
-    * are also singleton types
 * Scala 3
     * `Singleton` is used by the compiler as a supertype for singleton types
         * example
