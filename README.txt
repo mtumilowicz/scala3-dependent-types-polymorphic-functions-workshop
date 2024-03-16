@@ -246,6 +246,19 @@
 
             val result: 5 + 6 = 11
             ```
+            note that operations could be added, suppose that we want to add `Read` type for strings
+            ```
+            import scala.compiletime.ops.string.Read // type we want to add
+
+            val a: Read["path/to/some/file"] = "Hello\n"
+
+            // 1. go to Dotty core -> Types -> AppliedType -> tryNormalize -> tryCompiletimeConstantFold
+            // 1. find where types are handled and add additional entry
+            case tpne.Read => constantFold1(stringValue, scala.io.Source.fromFile(_).mkString)
+            // 1. add Read name to `tpne` (StdNames)
+            final val Read: N = "Read"
+            // 1. add to compiletimePackageStringTypes
+            ```
 * Scala 3
     * `Singleton` is used by the compiler as a supertype for singleton types
         * example
