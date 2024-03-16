@@ -231,6 +231,21 @@
             val iInput2: userInput2.type = userInput // not compiling, compiles only with `= userInput2`
             ```
     * bridge the gap between types and values
+        * example: compile-time operations on types
+            ```
+            import scala.compiletime.ops.string.*
+            // type Length[X <: String] <: Int
+
+            val a: Length["Hello"] = 5
+            val b: Length["Hello"] = "Hello".length() // not compiling, length() returns general Int, but we need 5
+            ```
+            or for int
+            ```
+            import scala.compiletime.ops.int.*
+            // type +[X <: Int, Y <: Int] <: Int
+
+            val result: 5 + 6 = 11
+            ```
 * Scala 3
     * `Singleton` is used by the compiler as a supertype for singleton types
         * example
