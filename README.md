@@ -58,6 +58,7 @@
     * https://www.stackbuilders.com/blog/reverse-reverse-theorem-proving-with-idris/
     * https://docs.scala-lang.org/scala3/reference/contextual/using-clauses.html
     * https://dotty.epfl.ch/api/scala/
+    * [Scala Type-Level Operations – Matt Bovel](https://www.youtube.com/watch?v=6OaW-_aFStA)
 
 ## preface
 * goals of this workshop
@@ -224,8 +225,9 @@
         val iType: i.type = i
         ```
     * bridge the gap between types and values
-* literal types are also singleton types
+* literal types = type inhabited by a single constant value known at compile-time
     * literal = an expression is equal to some specific primitive value known at compile time
+    * are also singleton types
 * Scala 3
     * `Singleton` is used by the compiler as a supertype for singleton types
         * example
