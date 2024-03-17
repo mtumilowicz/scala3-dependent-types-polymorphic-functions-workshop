@@ -59,6 +59,7 @@
     * https://docs.scala-lang.org/scala3/reference/contextual/using-clauses.html
     * https://dotty.epfl.ch/api/scala/
     * [Scala Type-Level Operations – Matt Bovel](https://www.youtube.com/watch?v=6OaW-_aFStA)
+    * [Rodolfo Hansen - Keep Your Types Small](https://www.youtube.com/watch?v=2Orv_l8_EVQ)
 
 ## preface
 * goals of this workshop
@@ -223,7 +224,7 @@
             ```
             val i5: 5 = 5
             ```
-        * types inhabited by a single term not known at compile-time
+        * types inhabited by a single value not known at compile-time
             ```
             val userInput = StdIn.readInt()
             val userInput2 = StdIn.readInt()
@@ -300,9 +301,14 @@
         val reverse2: [A] => List[A] => List[A] = [A] => (xs: List[A]) => reverse[A](xs) // polymorphic lambda
         ```
 * are not to be confused with type lambdas
-    * former describes the type of a polymorphic value
+    * polymorphic lambda describes type of a polymorphic value
         * are applied in terms
-    * latter is an actual function value at the type level
+            * terms = type inhabitants
+                * example
+                    * `Nothing` has 0 terms
+                    * `Unit` has 1 term
+                    * `Boolean` has 2 terms
+    * type lambda is an actual function value at the type level
         * are applied in types
 * type lambda
     * lets one express a higher-kinded type directly, without a type definition
@@ -500,7 +506,6 @@
     * inhabited types = provable theorems
 * relates systems of formal logic to models of computation
     * proofs correspond to terms (data values / expressions)
-        * example:
     * formulae to types
         * useful way to think of types is to view them as predictions
             * if the expression terminates, you know what form the expression is
