@@ -510,6 +510,7 @@
         * useful way to think of types is to view them as predictions
             * if the expression terminates, you know what form the expression is
     * proofs as programs
+        * proof of a proposition is a program of that type
         * provability corresponds to inhabitation
             * if we can find the values that exist for a given a type, it turns out that the type corresponds to a true mathematical theorem
     * normalisation of proofs as evaluation of programs
