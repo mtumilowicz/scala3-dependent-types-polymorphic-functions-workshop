@@ -529,7 +529,9 @@
             ```
     * is undecidable
         * Gödel’s incompleteness theorem, which says that even in the formal complete system you can come across with unprovable statements
-            * example: "this sentence is false" is true, then it is false, but the sentence states that it is false, and if it is false, then it must be true, and so on
+            * example: "this sentence is false"
+                * if true, then it is fals
+                * if false, then it must be true
 * second-order logic
     * apply quantifiers not only to atomic values but to sets and predicates as well
         * example: there exists a property that holds for all natural numbers greater than 5
