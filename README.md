@@ -506,15 +506,13 @@
     * sum type = disjunction
     * inhabited types = provable theorems
 * relates systems of formal logic to models of computation
-    * proofs correspond to terms (data values / expressions)
-    * formulae to types
+    * propositions as types
         * useful way to think of types is to view them as predictions
             * if the expression terminates, you know what form the expression is
+    * proofs as programs
         * provability corresponds to inhabitation
-            * if we can find the values that exist for a given a type, it turns out that the type corresponds
-                to a true mathematical theorem
-    * proof normalization corresponds to term reduction
-        * in other words: evaluation corresponds to simplification of proofs
+            * if we can find the values that exist for a given a type, it turns out that the type corresponds to a true mathematical theorem
+    * normalisation of proofs as evaluation of programs
 * propositional calculus
     * implication, negation, conjunction, disjunction, exclusive OR and equality
     * problem: doesn’t know about sets, considering just atomic values
