@@ -60,6 +60,7 @@
     * https://dotty.epfl.ch/api/scala/
     * [Scala Type-Level Operations – Matt Bovel](https://www.youtube.com/watch?v=6OaW-_aFStA)
     * [Rodolfo Hansen - Keep Your Types Small](https://www.youtube.com/watch?v=2Orv_l8_EVQ)
+    * [Philip Wadler – Propositions as Types](https://www.youtube.com/watch?v=ru20eaMYbDo)
 
 ## preface
 * goals of this workshop
@@ -529,9 +530,11 @@
             ```
     * is undecidable
         * Gödel’s incompleteness theorem, which says that even in the formal complete system you can come across with unprovable statements
-            * example: "this sentence is false"
-                * if true, then it is fals
-                * if false, then it must be true
+            * example: "this statement is not provable"
+                * case 1: this statement is false => it is provable => we proved something that is false
+                    * goes agains whole idea of proofs
+                    * if you can proove things that are false => logic is not very useful
+                * case 2: this statement is true => we have statements that are not provable
 * second-order logic
     * apply quantifiers not only to atomic values but to sets and predicates as well
         * example: there exists a property that holds for all natural numbers greater than 5
