@@ -61,6 +61,7 @@
     * [Scala Type-Level Operations – Matt Bovel](https://www.youtube.com/watch?v=6OaW-_aFStA)
     * [Rodolfo Hansen - Keep Your Types Small](https://www.youtube.com/watch?v=2Orv_l8_EVQ)
     * [Philip Wadler – Propositions as Types](https://www.youtube.com/watch?v=ru20eaMYbDo)
+    * [Emily Pillmore: Type Arithmetic and the Yoneda Lemma](https://www.youtube.com/watch?v=aXS5HZ_1fNQ)
 
 ## preface
 * goals of this workshop
@@ -220,7 +221,9 @@
     * example: `Function1[String, Nothing]`
 * singleton types = types which have a unique inhabitant
     * examples
-        * `Unit` = standard type that has only one inhabitant
+        * `Unit` = only one inhabitant
+        * `(a: A, b: B)` = |A| x |B| number of inhabitants
+        * `Either(a: A, b: B)` = |A| + |B| number of inhabitants
         * literal types = type inhabited by a single constant value known at compile-time (literal)
             ```
             val i5: 5 = 5
