@@ -597,6 +597,11 @@
 * propositions as types
     * bottom type = logical falsehood
         * Scala’s `Nothing` type
+        * used to define type negation
+            ```
+            type Not[A] = A => Nothing
+            ```
+            * on the logical side of Curry-Howard this maps to `A -> false`, which is equivalent to `~A`
     * function type = implication
     * product type = conjunction
     * sum type = disjunction
