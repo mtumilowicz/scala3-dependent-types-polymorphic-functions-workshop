@@ -1,4 +1,4 @@
-# scala3-dependent-types-polymorphic-functions-workshop
+# scala3-dependent-types-polymorphic-functions-phantom-types-workshop
 [![Build Status](https://app.travis-ci.com/mtumilowicz/scala3-dependent-types-polymorphic-functions-workshop.svg?token=PwyvjePQ7aiAX51hSYLE&branch=main)](https://app.travis-ci.com/mtumilowicz/scala3-dependent-types-polymorphic-functions-workshop)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -68,6 +68,7 @@
     * https://infoscience.epfl.ch/record/273667?ln=en
     * https://xebia.com/blog/compile-safe-builder-pattern-using-phantom-types-in-scala/
     * https://www.codecentric.de/wissens-hub/blog/phantom-types-scala
+    * https://www.scalamatters.io/post/phantom-types-without-phantom-pain
 
 ## preface
 * goals of this workshop
@@ -216,48 +217,85 @@
 
 ## phantom types
 * called this way, because they never get instantiated
+    * used to represent type relationships rather that working directly with their values
 * commonly used to express constraints encoded in types
-    * example: prevent some code from being compiled in certain situations
-* used to represent type relationships rather that working directly with their values
-* are needed only for compilation
-    * do not come with extra runtime overhead
-* problem: compile time safe builder
-    * example: create builder for `case class Person(firstName: String, lastName: String, email: String)`
+    * to prove static properties of the code using type evidences
+* prevent some code from being compiled in certain situations
+    * useful when representing models that have a particularily defined structural state with transitions
+    * example: assume we need a function that turns a machine on (`turnOn`), only if it is turned off
         ```
-        Person person = new PersonBuilder()
-            .firstName("Hello")
-            .lastName("World")
-            .build(); // runtime exception - forgot to specify the email
-        ```
-    * solution: phantom types
-        ```
-        class PersonBuilder[State <: PersonBuilderState] private (
-            val firstName: String,
-            val lastName: String,
-            val email: String) {
-          def firstName(firstName: String): PersonBuilder[State with FirstName] =
-            new PersonBuilder(firstName, lastName, email)
-          def lastName(lastName: String): PersonBuilder[State with LastName] =
-            new PersonBuilder(firstName, lastName, email)
-          def email(email: String): PersonBuilder[State with Email] =
-            new PersonBuilder(firstName, lastName, email)
-          def build()(using State =:= FullPerson): Person = { // phantom type
-            Person(firstName, lastName, email)
-          }
+        sealed trait MachineState
+        object MachineState {
+            sealed trait TurnedOn extends MachineState
+            sealed trait TurnedOff extends MachineState
         }
 
-        object PersonBuilder {
-          sealed trait PersonBuilderState
-          object PersonBuilderState {
-            sealed trait Empty extends PersonBuilderState
-            sealed trait FirstName extends PersonBuilderState
-            sealed trait LastName extends PersonBuilderState
-            sealed trait Email extends PersonBuilderState
-            type FullPerson = Empty with FirstName with LastName with Email
-          }
-          def apply(): PersonBuilder[Empty] = new PersonBuilder("", "", "")
+        case class Machine[State <: MachineState](){
+          def open(implicit ev: State =:= Closed) = Door[Open]()
+          def close(implicit ev: State =:= Open) = Door[Closed]()
         }
         ```
+* are needed only for compilation
+    * do not come with extra runtime overhead
+* builder pattern context
+    * example: sql query builder
+        * problem: aggregation query without `group_by` will fail
+        * solution: ZIO SQL
+            * https://github.com/zio/zio-sql/blob/b63708a35fb27eeab7a7edf4e320809fce77b5fc/core/jvm/src/main/scala/zio/sql/select/Read.scala#L183
+    * case study: case class builder
+        * problem: verification that all fields are filled
+            ```
+            case class Person(firstName: String, lastName: String, email: String)
+
+            Person person = new PersonBuilder()
+                .firstName("Hello")
+                .lastName("World")
+                .build(); // email not set, handle situation
+            ```
+        * solution
+            * naive approach
+                1. push checks to runtime - throw runtime exception
+                    * loosing referential transparency
+                1. `build()` returns `Either[Error, Person]`
+                    * troublesome for caller
+            * phantom types approach
+                ```
+                class PersonBuilder[State <: PersonBuilderState] private (
+                    val firstName: String,
+                    val lastName: String,
+                    val email: String) {
+                  def firstName(firstName: String): PersonBuilder[State with FirstName] =
+                    new PersonBuilder(firstName, lastName, email)
+                  def lastName(lastName: String): PersonBuilder[State with LastName] =
+                    new PersonBuilder(firstName, lastName, email)
+                  def email(email: String): PersonBuilder[State with Email] =
+                    new PersonBuilder(firstName, lastName, email)
+                  def build()(using State =:= FullPerson): Person = // phantom type
+                    Person(firstName, lastName, email)
+                }
+
+                object PersonBuilder {
+                  sealed trait PersonBuilderState
+                  object PersonBuilderState {
+                    sealed trait Empty extends PersonBuilderState
+                    sealed trait FirstName extends PersonBuilderState
+                    sealed trait LastName extends PersonBuilderState
+                    sealed trait Email extends PersonBuilderState
+                    type FullPerson = Empty with FirstName with LastName with Email
+                  }
+                  def apply(): PersonBuilder[Empty] = new PersonBuilder("", "", "")
+                }
+                ```
+* ZIO environment parameter context is phantom type
+    * is internally used by ZIO to verify that we have provided all the required environment
+        * only programs `ZIO[Any, _, _]` are executable
+    * usually there is no type `R` that user can provide
+        * example: `ZIO[R1 with R2, E, A]`
+            * we need to either provide
+                1. `ULayer[R1]`, `ULayer[R2]`
+                1. `ULayer[R1 with R2]`
+                    * there is no value `R1 with R2`
+
 
 ## singleton types
 * "inhabitant of a type" means an expression which has some given type
