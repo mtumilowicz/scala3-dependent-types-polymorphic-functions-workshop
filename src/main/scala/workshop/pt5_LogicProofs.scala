@@ -15,39 +15,39 @@ object pt5_LogicProofs {
     type M
     type S
 
-  object first {
-    // Some M are not P
-    trait Assumption1:
-      val x: Entity;
-      val value: (x.M, Not[x.P])
+  // (all S are M) and (all M are P) => (all S are P)
+  object Theorem1 {
+    type All_M_are_P = (x: Entity) => x.M => x.P
 
-    // All M are S
-    type Assumption2 = (x: Entity) => x.M => x.S
+    type All_S_are_M = (x: Entity) => x.S => x.M
 
-    // Some S are not P
-    trait Thesis:
-      val x: Entity;
-      val value: (x.S, Not[x.P])
+    type All_S_are_P = (x: Entity) => x.S => x.P
 
-    def proof(assumption: And[Assumption2, Assumption1]): Thesis = new Thesis:
-      val major = assumption._2
-      val minor = assumption._1
-      val x: major.x.type = major.x
-      val value = (minor(x) apply major.value._1, major.value._2)
+    def proof(assumption: And[All_M_are_P, All_S_are_M]): All_S_are_P =
+      x => assumption._1(x) compose assumption._2(x)
   }
 
-  object second {
-    //All M are P
-    type Assumption1 = (x: Entity) => x.M => x.P
+  // (some M are not P) and (all M are S) => some S are not P
+  object Theorem2 {
+    trait Some_M_are_not_P:
+      val x: Entity
+      val value: (x.M, Not[x.P])
 
-    //All S are M
-    type Assumption2 = (x: Entity) => x.S => x.M
+    type All_M_are_S = (x: Entity) => x.M => x.S
 
-    //All S are P
-    type Conclusion = (x: Entity) => x.S => x.P
+    trait Some_S_are_not_P:
+      val x: Entity
+      val value: (x.S, Not[x.P])
 
-    def proof(major: Assumption1, minor: Assumption2): Conclusion =
-      x => major(x) compose minor(x)
+    def proof(assumption: And[All_M_are_S, Some_M_are_not_P]): Some_S_are_not_P = new Some_S_are_not_P:
+      val some_M_are_not_P = assumption._2
+      val m = some_M_are_not_P.value._1
+      val not_P = some_M_are_not_P.value._2
+      val all_M_are_S = assumption._1
+      
+      val x: some_M_are_not_P.x.type = some_M_are_not_P.x
+      val s: x.S = all_M_are_S(x)(m)
+      val value: (x.S, Not[x.P]) = (s, not_P)
   }
 
 }
