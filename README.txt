@@ -62,6 +62,12 @@
     * [Rodolfo Hansen - Keep Your Types Small](https://www.youtube.com/watch?v=2Orv_l8_EVQ)
     * [Philip Wadler – Propositions as Types](https://www.youtube.com/watch?v=ru20eaMYbDo)
     * [Emily Pillmore: Type Arithmetic and the Yoneda Lemma](https://www.youtube.com/watch?v=aXS5HZ_1fNQ)
+    * [Formal Logic Undressed — Paul Snively](https://www.youtube.com/watch?v=saMtzIaDCJM)
+    * https://milessabin.com/blog/2011/06/09/scala-union-types-curry-howard/
+    * https://medium.com/@maximilianofelice/builder-pattern-in-scala-with-phantom-types-3e29a167e863
+    * https://infoscience.epfl.ch/record/273667?ln=en
+    * https://xebia.com/blog/compile-safe-builder-pattern-using-phantom-types-in-scala/
+    * https://www.codecentric.de/wissens-hub/blog/phantom-types-scala
 
 ## preface
 * goals of this workshop
@@ -188,11 +194,13 @@
     1. `pt4_pathDependent`
         * rewrite path dependent approach into generics
         * discuss variance
-    1. `pt5_proofs`
+    1. `pt5_LogicalProofs`
         * proof theorems:
             1. (all S are M) and (all M are P) => all S are P
             1. (not all S are M) and (all M are P) => not all S are P
-
+    1. `pt6_CurryHoward`
+        * using De Morgan's law implement equivalent of sum type: `|`
+        * use phantom types to apply that in method's as evidence
 ## prerequisite
 * `summon[T]`
     * find a given instance of type `T` in the current scope
@@ -205,6 +213,51 @@
         ```
 * `<:<`
     * instance of `A <:< B` witnesses that `A` is a subtype of `B`
+
+## phantom types
+* called this way, because they never get instantiated
+* commonly used to express constraints encoded in types
+    * example: prevent some code from being compiled in certain situations
+* used to represent type relationships rather that working directly with their values
+* are needed only for compilation
+    * do not come with extra runtime overhead
+* problem: compile time safe builder
+    * example: create builder for `case class Person(firstName: String, lastName: String, email: String)`
+        ```
+        Person person = new PersonBuilder()
+            .firstName("Hello")
+            .lastName("World")
+            .build(); // runtime exception - forgot to specify the email
+        ```
+    * solution: phantom types
+        ```
+        class PersonBuilder[State <: PersonBuilderState] private (
+            val firstName: String,
+            val lastName: String,
+            val email: String) {
+          def firstName(firstName: String): PersonBuilder[State with FirstName] =
+            new PersonBuilder(firstName, lastName, email)
+          def lastName(lastName: String): PersonBuilder[State with LastName] =
+            new PersonBuilder(firstName, lastName, email)
+          def email(email: String): PersonBuilder[State with Email] =
+            new PersonBuilder(firstName, lastName, email)
+          def build()(using State =:= FullPerson): Person = { // phantom type
+            Person(firstName, lastName, email)
+          }
+        }
+
+        object PersonBuilder {
+          sealed trait PersonBuilderState
+          object PersonBuilderState {
+            sealed trait Empty extends PersonBuilderState
+            sealed trait FirstName extends PersonBuilderState
+            sealed trait LastName extends PersonBuilderState
+            sealed trait Email extends PersonBuilderState
+            type FullPerson = Empty with FirstName with LastName with Email
+          }
+          def apply(): PersonBuilder[Empty] = new PersonBuilder("", "", "")
+        }
+        ```
 
 ## singleton types
 * "inhabitant of a type" means an expression which has some given type
@@ -504,6 +557,8 @@
         * existence of an 𝐵
         * or which 𝐵 we get
 * propositions as types
+    * bottom type = logical falsehood
+        * Scala’s `Nothing` type
     * function type = implication
     * product type = conjunction
     * sum type = disjunction
