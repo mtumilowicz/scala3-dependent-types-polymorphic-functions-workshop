@@ -69,6 +69,8 @@
     * https://xebia.com/blog/compile-safe-builder-pattern-using-phantom-types-in-scala/
     * https://www.codecentric.de/wissens-hub/blog/phantom-types-scala
     * https://www.scalamatters.io/post/phantom-types-without-phantom-pain
+    * [A Crash Course in Category Theory - Bartosz Milewski](https://www.youtube.com/watch?v=JH_Ou17_zyU)
+    * https://math.stackexchange.com/questions/2561353/set-of-functions-from-empty-set-to-0-1
 
 ## preface
 * goals of this workshop
@@ -602,6 +604,13 @@
             type Not[A] = A => Nothing
             ```
             * on the logical side of Curry-Howard this maps to `A -> false`, which is equivalent to `~A`
+        * polymorphic function `absurd[A]: Nothing => A` corresponds to statement "from falsehood you can derive everything"
+            * it cannot be constructed, but intuitively it is just a promise: if you give me element of nothing I will
+            give you element of `A`
+                * usually called `absurd[A]: Nothing => A`
+                * notice that for any set 𝐴, there is exactly one function from the empty set to 𝐴
+                    * graph of an empty function is a subset of the Cartesian product ∅×𝐴
+                        * since the product is empty the only such subset is the empty set ∅
     * function type = implication
     * product type = conjunction
     * sum type = disjunction
