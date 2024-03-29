@@ -471,21 +471,9 @@
             ```
 * let you move some checks to the type system itself
     * making it impossible to fail while the program is running
-* use case: multiplying matrices
-    * problem: `ArrayIndexOutOfBoundsException`
-    * solution: encode matrix size in type and verify if multiply is possible at compile time
-* problem: can't automatically do type inference
-    * maybe place for AI?
-    * archetypal example of the compiler "not being able to see stuff" is the fact that
-    applying reverse twice gives you the original list
-    * have to write annotations for your program in the form of proofs
-        * proposition: enforce additional invariants in types without going all the way to a full specification
-* formal verification context
-    * formal verification is an automated process that uses mathematical techniques to prove the correctness of the program
-        * can prove that program's business logic meets a predefined specification
-    * formal model is a mathematical description of a computational process
-        * provide a level of abstraction over which analysis of a program's behavior can be evaluated
 * use cases
+    1. multiplying matrices
+        * encode matrix size in type and verify if multiply is possible at compile time
     1. database queries
         * type of valid queries depends on the "shape" of the database
         * type of the result of a query depends on the query itself
@@ -497,6 +485,12 @@
             * example: uncompressed picture
                 * starts with the size of the picture, number of color channels, bit depth, alignment;
                 followed by the raw data, whose size and interpretation depends on those parameters
+* Scala context
+    * type structure cannot be deduced from runtime structure
+        * example: filter in sized vector
+            ```
+            def filter(p: A => Boolean): SizedList[???, A] // size depends on runtime application of predicate
+            ```
 
 ## path dependent types
 * Scala unifies concepts from object and module systems
