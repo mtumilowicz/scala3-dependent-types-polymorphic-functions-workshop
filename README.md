@@ -71,6 +71,7 @@
     * https://www.scalamatters.io/post/phantom-types-without-phantom-pain
     * [A Crash Course in Category Theory - Bartosz Milewski](https://www.youtube.com/watch?v=JH_Ou17_zyU)
     * https://math.stackexchange.com/questions/2561353/set-of-functions-from-empty-set-to-0-1
+    * [Idris for (im)practical Scala programmers - Marcin Rzeźnicki - Chamberconf 2018](https://www.youtube.com/watch?v=zCJWv9X8eKM)
 
 ## preface
 * goals of this workshop
@@ -204,6 +205,7 @@
     1. `pt6_CurryHoward`
         * using De Morgan's law implement equivalent of sum type: `|`
         * use phantom types to apply that in method's as evidence
+
 ## prerequisite
 * `summon[T]`
     * find a given instance of type `T` in the current scope
@@ -442,9 +444,14 @@
 ## dependent types
 * gradation
     * values depending on values: functions
-    * values depending on types: classes
-    * types depending on types: type functions
+        * typed lambda calculi: term - term
+    * values depending on types: polymorphism
+        ```
+        def twice[A](a: A)(f: A => A): A = f(f(a))
+        ```
     * types depending on values: dependent types
+    * types depending on types: type functions
+        * higher order types
 * dependent type systems: "values may also appear in types"
 * question of how to enforce invariants has two answers in dependent types
     * intrinsic
@@ -615,6 +622,9 @@
     * product type = conjunction
     * sum type = disjunction
     * inhabited types = provable theorems
+        * we cannot implement generic function `f: A => B`
+            * it would mean we can prove implication `A -> B` - from any information `A` we can derive any information `B`
+            * to do that, we need some kind of connection between `A` and `B`
 * relates systems of formal logic to models of computation
     * propositions as types
         * useful way to think of types is to view them as predictions
