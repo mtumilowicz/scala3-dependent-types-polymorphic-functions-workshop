@@ -81,10 +81,12 @@
             * `=:=`
             * type level programming
             * polymorphic functions
+    * applying phantom types to provide compile-time proofs     
     * understanding path dependent types
         * applying knowledge in practice
     * noticing correspondence between logic and computations
         * formal proofs for basic tautologies
+        * implemetation of union types using `with`
 * workshop plan
     1. `pt1_SizedList`
         * context: rust
