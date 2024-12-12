@@ -619,8 +619,13 @@
         * example: proof that `(a^b)^c = a^(b x c)`
             * logic: `(c⟹(b⟹a))⟺((b∧c)⟹a)`
             * types: `((b, c) -> a) <=> (c -> b -> a)`
-                * `curry :: ((b, c) -> a) -> c -> b -> a`
-                * `uncurry :: (c -> b -> a) -> (b, c) -> a`
+                ```
+                curry :: ((b, c) -> a) -> c -> b -> a
+                curry g c b = g (b, c)
+
+                uncurry :: (c -> b -> a) -> (b, c) -> a
+                uncurry f (b, c) = f c b
+                ```
     * product type = conjunction
     * sum type = disjunction
     * inhabited types = provable theorems
