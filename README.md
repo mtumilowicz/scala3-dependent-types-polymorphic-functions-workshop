@@ -72,6 +72,8 @@
     * [A Crash Course in Category Theory - Bartosz Milewski](https://www.youtube.com/watch?v=JH_Ou17_zyU)
     * https://math.stackexchange.com/questions/2561353/set-of-functions-from-empty-set-to-0-1
     * [Idris for (im)practical Scala programmers - Marcin Rzeźnicki - Chamberconf 2018](https://www.youtube.com/watch?v=zCJWv9X8eKM)
+    * https://leanpub.com/thinking-with-types/
+    * https://chatgpt.com
 
 ## preface
 * goals of this workshop
@@ -591,7 +593,6 @@
                     ```
 
 ## Curry-Howard isomorphism
-* proposition refers to a statement or assertion that can be either true or false
 * both logic and programming with functions are built around the notion of hypotheticals
     * proposition `𝐴→𝐵` says "if I had an 𝐴, I could prove 𝐵"
     * function of type `𝐴→𝐵` says "if I had a value of type 𝐴, I could compute a value of type 𝐵"
@@ -615,6 +616,11 @@
                     * graph of an empty function is a subset of the Cartesian product ∅×𝐴
                         * since the product is empty the only such subset is the empty set ∅
     * function type = implication
+        * example: proof that `(a^b)^c = a^(b x c)`
+            * logic: `(c⟹(b⟹a))⟺((b∧c)⟹a)`
+            * types: `((b, c) -> a) <=> (c -> b -> a)`
+                * `curry :: ((b, c) -> a) -> c -> b -> a`
+                * `uncurry :: (c -> b -> a) -> (b, c) -> a`
     * product type = conjunction
     * sum type = disjunction
     * inhabited types = provable theorems
