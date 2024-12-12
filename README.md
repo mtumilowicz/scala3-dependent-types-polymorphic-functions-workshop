@@ -406,7 +406,7 @@
 * are not to be confused with type lambdas
     * polymorphic lambda describes type of a polymorphic value
         * are applied in terms
-            * terms = type inhabitants
+            * terms = type inhabitants (~ exist at runtime)
                 * example
                     * `Nothing` has 0 terms
                     * `Unit` has 1 term
