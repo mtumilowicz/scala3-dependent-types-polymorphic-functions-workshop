@@ -632,6 +632,15 @@
         * we cannot implement generic function `f: A => B`
             * it would mean we can prove implication `A -> B` - from any information `A` we can derive any information `B`
             * to do that, we need some kind of connection between `A` and `B`
+    * summary
+        | Algebra | Logic       | Types           |
+        |---------|-------------|-----------------|
+        | a + b   | a ∨ b       | Either a b      |
+        | a × b   | a ∧ b       | (a, b)          |
+        | b^a     | a ⇒ b       | a -> b          |
+        | a = b   | a ⇔ b       | isomorphism     |
+        | 0       | ⊥           | Void            |
+        | 1       | ⊤           | ()              |
 * relates systems of formal logic to models of computation
     * propositions as types
         * useful way to think of types is to view them as predictions
@@ -685,3 +694,6 @@
 * in some sense, the Curry-Howard isomorphism isn't an isomorphism at all
     * some people prefer the word "correspondence"
     * maybe it's not "two things that are isomorphic" but "two different views of the same thing"
+        * example: `a^1 = a`
+            * when viewed through Curry–Howard, it describes an isomorphism between `() -> a` and `a`
+            * no distinction between having a value and having a (pure) program that computes that value
